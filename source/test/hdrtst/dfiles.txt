@@ -1,3 +1,0 @@
-bidi.h
-convert.h
-unicode.h
