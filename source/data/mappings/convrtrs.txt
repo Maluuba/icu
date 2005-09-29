@@ -165,6 +165,8 @@ UTF-16BE { IANA* MIME* JAVA* }  x-utf-16be { JAVA }
                                 ibm-17585 { IBM } # Unicode 3.0, UTF-16 BE
                                 ibm-21680 { IBM } # Unicode 4.0, UTF-16 BE with IBM PUA
                                 ibm-21681 { IBM } # Unicode 4.0, UTF-16 BE
+                                ibm-25776 { IBM } # Unicode 4.1, UTF-16 BE with IBM PUA
+                                ibm-25777 { IBM } # Unicode 4.1, UTF-16 BE
                                 ibm-61955 { IBM } # UTF-16BE with Gaidai University (Japan) PUA
                                 ibm-61956 { IBM } # UTF-16BE with HKSCS-Big 5 PUA
                                 windows-1201 { WINDOWS* }
@@ -184,6 +186,8 @@ UTF-16LE { IANA* MIME* JAVA* }  x-utf-16le { JAVA }
                                 ibm-17587 { IBM } # Unicode 3.0, UTF-16 LE
                                 ibm-21682 { IBM } # Unicode 4.0, UTF-16 LE with IBM PUA
                                 ibm-21683 { IBM } # Unicode 4.0, UTF-16 LE
+                                ibm-25778 { IBM } # Unicode 4.1, UTF-16 LE with IBM PUA
+                                ibm-25779 { IBM } # Unicode 4.1, UTF-16 LE
                                 UTF16_LittleEndian
                                 windows-1200 { WINDOWS* }
 
@@ -285,7 +289,7 @@ ibm-367_P100-1995 { UTR22* }    ibm-367 { IBM* } IBM367 { IANA* }   # This is AS
 # Central Europe
 ibm-912_P100-1995 { UTR22* }
                         ibm-912 { IBM* JAVA }
-                        iso-8859-2 { MIME* IANA JAVA* WINDOWS }
+                        ISO-8859-2 { MIME* IANA JAVA* WINDOWS }
                         ISO_8859-2:1987 { IANA* WINDOWS JAVA }
                         latin2 { IANA WINDOWS JAVA }
                         csISOLatin2 { IANA WINDOWS JAVA }
@@ -299,7 +303,7 @@ ibm-912_P100-1995 { UTR22* }
 # Maltese Esperanto
 ibm-913_P100-2000 { UTR22* }
                         ibm-913 { IBM* JAVA }
-                        iso-8859-3 { MIME* IANA WINDOWS JAVA* }
+                        ISO-8859-3 { MIME* IANA WINDOWS JAVA* }
                         ISO_8859-3:1988 { IANA* WINDOWS JAVA }
                         latin3 { IANA JAVA WINDOWS }
                         csISOLatin3 { IANA WINDOWS }
@@ -313,7 +317,7 @@ ibm-913_P100-2000 { UTR22* }
 # Baltic
 ibm-914_P100-1995 { UTR22* }
                         ibm-914 { IBM* JAVA }
-                        iso-8859-4 { MIME* IANA WINDOWS JAVA* }
+                        ISO-8859-4 { MIME* IANA WINDOWS JAVA* }
                         latin4 { IANA WINDOWS JAVA }
                         csISOLatin4 { IANA WINDOWS JAVA }
                         iso-ir-110 { IANA WINDOWS JAVA }
@@ -327,7 +331,7 @@ ibm-914_P100-1995 { UTR22* }
 # Cyrillic
 ibm-915_P100-1995 { UTR22* }
                         ibm-915 { IBM* JAVA }
-                        iso-8859-5 { MIME* IANA WINDOWS JAVA* }
+                        ISO-8859-5 { MIME* IANA WINDOWS JAVA* }
                         cyrillic { IANA WINDOWS JAVA }
                         csISOLatinCyrillic { IANA WINDOWS JAVA }
                         iso-ir-144 { IANA WINDOWS JAVA }
@@ -344,7 +348,7 @@ ibm-915_P100-1995 { UTR22* }
 # -E requires the client to handle the ISO 6429 bidirectional controls
 ibm-1089_P100-1995 { UTR22* }
                         ibm-1089 { IBM* JAVA }
-                        iso-8859-6 { MIME* IANA WINDOWS JAVA* }
+                        ISO-8859-6 { MIME* IANA WINDOWS JAVA* }
                         arabic { IANA WINDOWS JAVA }
                         csISOLatinArabic { IANA WINDOWS JAVA }
                         iso-ir-127 { IANA WINDOWS JAVA }
@@ -361,7 +365,7 @@ ibm-1089_P100-1995 { UTR22* }
 # ISO Greek (with euro update). This is really ISO_8859-7:2003
 ibm-9005_X100-2005 { UTR22* }
                         ibm-9005 { IBM* }
-                        iso-8859-7 { MIME* IANA WINDOWS }
+                        ISO-8859-7 { MIME* IANA WINDOWS }
                         greek { IANA WINDOWS }
                         greek8 { IANA WINDOWS }
                         ELOT_928 { IANA WINDOWS }
@@ -375,7 +379,7 @@ ibm-9005_X100-2005 { UTR22* }
 # JDK 1.5 has these aliases.
 ibm-813_P100-1995 { UTR22* }
                         ibm-813 { IBM* JAVA }
-                        iso-8859-7 { JAVA* }
+                        ISO-8859-7 { JAVA* }
                         greek { JAVA }
                         greek8 { JAVA }
                         ELOT_928 { JAVA }
@@ -394,7 +398,7 @@ ibm-813_P100-1995 { UTR22* }
 # -E requires the client to handle the ISO 6429 bidirectional controls
 ibm-916_P100-1995 { UTR22* }
                         ibm-916 { IBM* JAVA }
-                        iso-8859-8 { MIME* IANA WINDOWS JAVA* }
+                        ISO-8859-8 { MIME* IANA WINDOWS JAVA* }
                         hebrew { IANA WINDOWS JAVA }
                         csISOLatinHebrew { IANA WINDOWS JAVA }
                         iso-ir-138 { IANA WINDOWS JAVA }
@@ -409,7 +413,7 @@ ibm-916_P100-1995 { UTR22* }
 # Turkish
 ibm-920_P100-1995 { UTR22* }
                         ibm-920 { IBM* JAVA }
-                        iso-8859-9 { MIME* IANA WINDOWS JAVA* }
+                        ISO-8859-9 { MIME* IANA WINDOWS JAVA* }
                         latin5 { IANA WINDOWS JAVA }
                         csISOLatin5 { IANA JAVA }
                         iso-ir-148 { IANA WINDOWS JAVA }
@@ -421,18 +425,40 @@ ibm-920_P100-1995 { UTR22* }
                         windows-28599 { WINDOWS* }
                         ECMA-128    # IANA doesn't have this alias 6/24/2002
 
+# Nordic languages
+iso-8859_10-1998 { UTR22* } ISO-8859-10 { MIME* IANA* }
+                        iso-ir-157 { IANA }
+                        l6 { IANA }
+                        ISO_8859-10:1992 { IANA }
+                        csISOLatin6 { IANA }
+                        latin6 { IANA }
+
+# Thai
+# Be warned. There several iso-8859-11 codepage variants, and they are all incompatible.
+# ISO-8859-11 is a superset of TIS-620. The difference is that ISO-8859-11 contains the C1 control codes.
+iso-8859_11-2001 { UTR22* } ISO-8859-11
+                        thai8 # HP-UX alias. HP-UX says TIS-620, but it's closer to ISO-8859-11.
+
 # iso-8859-13, PC Baltic (w/o euro update)
 ibm-921_P100-1995 { UTR22* }
                         ibm-921 { IBM* }
-                        iso-8859-13 { IANA* MIME* JAVA* }
+                        ISO-8859-13 { IANA* MIME* JAVA* }
                         8859_13 { JAVA }
                         cp921
                         921
 
+# Celtic
+iso-8859_14-1998 { UTR22* } ISO-8859-14 { IANA* }
+                        iso-ir-199 { IANA }
+                        ISO_8859-14:1998 { IANA }
+                        latin8 { IANA }
+                        iso-celtic { IANA }
+                        l8 { IANA }
+
 # Latin 9
 ibm-923_P100-1998 { UTR22* }
                         ibm-923 { IBM* JAVA }
-                        iso-8859-15 { IANA* MIME* WINDOWS JAVA* }
+                        ISO-8859-15 { IANA* MIME* WINDOWS JAVA* }
                         Latin-9 { IANA WINDOWS }
                         l9 { WINDOWS }
                         8859_15 { JAVA }
@@ -494,6 +520,7 @@ ibm-33722_P12A-1999 { UTR22* }
                         X-EUC-JP { WINDOWS JAVA }   # Japan EUC. x-euc-jp is a MIME name
                         eucjis { JAVA }
                         windows-51932 { WINDOWS* }
+                        ujis # Linux sometimes uses this name. This is an unfortunate generic and rarely used name. It's use is discouraged.
                         ibm-33722_VPUA
                         IBM-eucJP
 ibm-33722_P120-1999 { UTR22* }  # Japan EUC with \ <-> Yen mapping
@@ -529,6 +556,7 @@ ibm-1375_P100-2003 { UTR22* }   # IBM's interpretation of Windows' Taiwan Big-5 
                         ibm-1375 { IBM* }
                         Big5-HKSCS
                         MS950_HKSCS { JAVA* }
+                        hkbig5 # from HP-UX 11i, which can't handle supplementary characters.
                         # windows-950 # Windows-950 can be w/ or w/o HKSCS extensions. By default it's not.
                         # windows-950_hkscs
 
@@ -667,8 +695,8 @@ ibm-874_P100-1995 { UTR22* }    # Thai PC (w/o euro update).
                         ibm-874 { IBM* JAVA }
                         ibm-9066 { IBM }    # Yes ibm-874 == ibm-9066. ibm-1161 has the euro update.
                         cp874 { JAVA* }
-                        TIS-620 { IANA* JAVA }  # This actually separate from ibm-874, which is similar to this table
-                        tis620.2533 { JAVA }    # This actually separate from ibm-874, which is similar to this table
+                        TIS-620 { IANA* JAVA }  # This is actually separate from ibm-874, which is similar to this table
+                        tis620.2533 { JAVA }    # This is actually separate from ibm-874, which is similar to this table
                         eucTH               # eucTH is an unusual alias from Solaris.  eucTH has fewer mappings than TIS620
 
 ibm-1162_P100-1999 { UTR22* }   # Thai (w/ euro update)
@@ -707,7 +735,7 @@ ibm-4909_P100-1999 { UTR22* }   ibm-4909 { IBM* } # ISO Greek (w/ euro update), 
 # cp is usually used to denote IBM in Java, and that is why we don't do that anymore.
 # The windows-* aliases mean windows codepages.
 ibm-5346_P100-1998 { UTR22* }   ibm-5346 { IBM* } windows-1250 { IANA* JAVA* WINDOWS* } cp1250 { WINDOWS JAVA } # Windows Latin2 (w/ euro update)
-ibm-5347_P100-1998 { UTR22* }   ibm-5347 { IBM* } windows-1251 { IANA* JAVA* WINDOWS* } cp1251 { WINDOWS JAVA } # Windows Cyrillic (w/ euro update)
+ibm-5347_P100-1998 { UTR22* }   ibm-5347 { IBM* } windows-1251 { IANA* JAVA* WINDOWS* } cp1251 { WINDOWS JAVA } ANSI1251 # Windows Cyrillic (w/ euro update). ANSI1251 is from Solaris
 ibm-5348_P100-1997 { UTR22* }   ibm-5348 { IBM* } windows-1252 { IANA* JAVA* WINDOWS* } cp1252 { JAVA }         # Windows Latin1 (w/ euro update)
 ibm-5349_P100-1998 { UTR22* }   ibm-5349 { IBM* } windows-1253 { IANA* JAVA* WINDOWS* } cp1253 { JAVA }         # Windows Greek (w/ euro update)
 ibm-5350_P100-1998 { UTR22* }   ibm-5350 { IBM* } windows-1254 { IANA* JAVA* WINDOWS* } cp1254 { JAVA }         # Windows Turkish (w/ euro update)
