@@ -1,6 +1,6 @@
 /*****************************************************************************
 *
-*   Copyright (C) 1999-2010, International Business Machines
+*   Copyright (C) 1999-2014, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 *
 ******************************************************************************/
@@ -26,6 +26,7 @@
 #include <unicode/translit.h>
 #include <unicode/uset.h>
 #include <unicode/uclean.h>
+#include <unicode/utf16.h>
 
 #include <stdio.h>
 #include <errno.h>
@@ -40,10 +41,10 @@
 
 U_NAMESPACE_USE
 
-#if (defined(U_WINDOWS) || defined(U_CYGWIN)) && !defined(__STRICT_ANSI__)
+#if U_PLATFORM_USES_ONLY_WIN32_API && !defined(__STRICT_ANSI__)
 #include <io.h>
 #include <fcntl.h>
-#if defined(U_WINDOWS)
+#if U_PLATFORM_USES_ONLY_WIN32_API
 #define USE_FILENO_BINARY_MODE 1
 /* Windows likes to rename Unix-like functions */
 #ifndef fileno
@@ -88,7 +89,7 @@ static void initMsg(const char *pname) {
         ps = 1;
 
         /* Set up our static data - if any */
-#ifdef UCONVMSG_LINK
+#if defined(UCONVMSG_LINK) && U_PLATFORM != U_PF_OS390 /* On z/OS, this is failing. */
         udata_setAppData(UCONVMSG, (const void*) uconvmsg_dat, &err);
         if (U_FAILURE(err)) {
           fprintf(stderr, "%s: warning, problem installing our static resource bundle data uconvmsg: %s - trying anyways.\n",
@@ -593,6 +594,7 @@ ConvertFile::convertFile(const char *pname,
     UConverter *convto = 0;
     UErrorCode err = U_ZERO_ERROR;
     UBool flush;
+    UBool closeFile = FALSE;
     const char *cbufp, *prevbufp;
     char *bufp;
 
@@ -628,6 +630,7 @@ ConvertFile::convertFile(const char *pname,
             u_wmsg(stderr, "cantOpenInputF", str1.getBuffer(), str2.getBuffer());
             return FALSE;
         }
+        closeFile = TRUE;
     } else {
         infilestr = "-";
         infile = stdin;
@@ -656,9 +659,9 @@ ConvertFile::convertFile(const char *pname,
         parse.line = -1;
 
         if (uprv_strchr(translit, ':') || uprv_strchr(translit, '>') || uprv_strchr(translit, '<') || uprv_strchr(translit, '>')) {
-            t = Transliterator::createFromRules("Uconv", str, UTRANS_FORWARD, parse, err);
+            t = Transliterator::createFromRules(UNICODE_STRING_SIMPLE("Uconv"), str, UTRANS_FORWARD, parse, err);
         } else {
-            t = Transliterator::createInstance(translit, UTRANS_FORWARD, err);
+            t = Transliterator::createInstance(UnicodeString(translit, -1, US_INV), UTRANS_FORWARD, err);
         }
 
         if (U_FAILURE(err)) {
@@ -1051,7 +1054,7 @@ normal_exit:
     delete t;
 #endif
 
-    if (infile != stdin) {
+    if (closeFile) {
         fclose(infile);
     }
 
@@ -1134,7 +1137,7 @@ main(int argc, char **argv)
 
     // Get and prettify pname.
     pname = uprv_strrchr(*argv, U_FILE_SEP_CHAR);
-#ifdef U_WINDOWS
+#if U_PLATFORM_USES_ONLY_WIN32_API
     if (!pname) {
         pname = uprv_strrchr(*argv, '/');
     }
@@ -1377,6 +1380,8 @@ normal_exit:
     if (outfile != stdout) {
         fclose(outfile);
     }
+
+    u_cleanup();
 
     return ret;
 }

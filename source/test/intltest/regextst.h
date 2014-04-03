@@ -1,6 +1,6 @@
 /********************************************************************
  * COPYRIGHT:
- * Copyright (c) 2002-2010, International Business Machines Corporation and
+ * Copyright (c) 2002-2013, International Business Machines Corporation and
  * others. All Rights Reserved.
  ********************************************************************/
 
@@ -43,7 +43,12 @@ public:
     virtual void PreAllocatedUTextCAPI();
     virtual void Bug7651();
     virtual void Bug7740();
-
+    virtual void Bug8479();
+    virtual void Bug7029();
+    virtual void Bug9283();
+    virtual void CheckInvBufSize();
+    virtual void Bug10459();
+    
     // The following functions are internal to the regexp tests.
     virtual void assertUText(const char *expected, UText *actual, const char *file, int line);
     virtual void assertUTextInvariant(const char *invariant, UText *actual, const char *file, int line);
@@ -56,6 +61,8 @@ public:
     virtual UChar *ReadAndConvertFile(const char *fileName, int32_t &len, const char *charset, UErrorCode &status);
     virtual const char *getPath(char buffer[2048], const char *filename);
 
+    static const char* extractToAssertBuf(const UnicodeString& message);
+    
 };
 
 #endif   // !UCONFIG_NO_REGULAR_EXPRESSIONS

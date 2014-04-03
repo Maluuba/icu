@@ -1,6 +1,6 @@
 /********************************************************************
  * COPYRIGHT: 
- * Copyright (c) 1997-2010, International Business Machines Corporation and
+ * Copyright (c) 1997-2014, International Business Machines Corporation and
  * others. All Rights Reserved.
  ********************************************************************/
 
@@ -55,6 +55,10 @@ DateFormatRegressionTest::runIndexedTest( int32_t index, UBool exec, const char*
         CASE(24,Test714)
         CASE(25,Test1684)
         CASE(26,Test5554)
+        CASE(27,Test9237)
+        CASE(28,TestParsing)
+        CASE(29,TestT10334)
+        CASE(30,TestT10619)
         default: name = ""; break;
     }
 }
@@ -82,6 +86,7 @@ void DateFormatRegressionTest::Test4029195(void)
     pat = sdf->toPattern(pat);
     logln("pattern: " + pat);
     UnicodeString fmtd;
+
     FieldPosition pos(FieldPosition::DONT_CARE);
     fmtd = sdf->format(today, fmtd, pos);
     logln("today: " + fmtd);
@@ -132,7 +137,7 @@ void DateFormatRegressionTest::Test4052408(void)
     str = fmt->format(dt, str);
     logln(str);
     
-    if(str != "5/3/97 8:55 AM")
+    if(str != "5/3/97, 8:55 AM")
         errln("Fail: Test broken; Want 5/3/97 8:55 AM Got " + str);   
     
     UnicodeString expected[] = {
@@ -362,6 +367,8 @@ void DateFormatRegressionTest::Test4060212(void)
         errln((UnicodeString) "Fail: Got " + cal->get(UCAL_DAY_OF_YEAR, status) +
                             " Want 40");
 
+    // this is an odd usage of "ddd" and it doesn't
+    // work now that date values are range checked per #3579.
     logln("Using yyyy-ddd.hh:mm:ss");
     delete formatter;
     formatter = NULL;
@@ -398,7 +405,7 @@ void DateFormatRegressionTest::Test4061287(void)
     failure(status, "new SimpleDateFormat");
     //try {
     logln(UnicodeString("") + df->parse("35/01/1971", status));  
-    failure(status, "df->parse");
+    failure(status, "df->parse(\"35/01/1971\")");
     //logln(df.parse("35/01/1971").toString());
     //}
     /*catch (ParseException e) {
@@ -554,7 +561,7 @@ void DateFormatRegressionTest::Test4071441(void)
   US locale a string formatted according to mm/dd/yy and parses it
   correctly.
 
-  When given a string mm/dd/yyyy it only parses up to the first
+  When given a string mm/dd/yyyy [sic] it only parses up to the first
   two y's, typically resulting in a date in the year 1919.
   
   Please extend the parsing method(s) to handle strings with
@@ -567,7 +574,7 @@ void DateFormatRegressionTest::Test4073003(void)
 {
     //try {
     UErrorCode ec = U_ZERO_ERROR;
-    SimpleDateFormat fmt("dd/MM/yy", Locale::getUK(), ec);
+    SimpleDateFormat fmt("MM/dd/yy", Locale::getUK(), ec);
     if (U_FAILURE(ec)) {
         dataerrln("FAIL: SimpleDateFormat constructor - %s", u_errorName(ec));
         return;
@@ -716,8 +723,8 @@ void DateFormatRegressionTest::Test4101483(void)
     sdf->format(d, buf, fp);
     //logln(sdf.format(d, buf, fp).toString());
     logln(dateToString(d) + " => " + buf);
-    logln("beginIndex = " + fp.getBeginIndex());
-    logln("endIndex = " + fp.getEndIndex());
+    logln(UnicodeString("beginIndex = ") + fp.getBeginIndex());
+    logln(UnicodeString("endIndex = ") + fp.getEndIndex());
     if (fp.getBeginIndex() == fp.getEndIndex()) 
         errln("Fail: Empty field");
 
@@ -839,7 +846,7 @@ void DateFormatRegressionTest::Test4104136(void)
         logln(" index: %d", pos.getIndex()); 
         logln((UnicodeString) " result: " + d);
         if(pos.getIndex() != finish.getIndex())
-            errln("Fail: Expected pos " + finish.getIndex());
+            errln(UnicodeString("Fail: Expected pos ") + finish.getIndex());
         if (! ((d == 0 && exp == -1) || (d == exp)))
             errln((UnicodeString) "Fail: Expected result " + exp);
     }
@@ -1457,6 +1464,198 @@ void DateFormatRegressionTest::Test5554(void)
     errln("\nError: Newfoundland Z of Jan 14, 2007 gave '" + result + "', expected '" + correct + "'");
   }
   delete sdf;
+}
+
+void DateFormatRegressionTest::Test9237(void)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    UnicodeString pattern("VVVV");
+
+    SimpleDateFormat fmt(pattern, status);  // default locale
+    SimpleDateFormat fmtDE(pattern, Locale("de_DE"), status);
+    if (U_FAILURE(status)) {
+        dataerrln("Error constructing SimpleDateFormat");
+        return;
+    }
+
+    // copy constructor
+    SimpleDateFormat fmtCopyDE(fmtDE);
+    UnicodeString resDE, resCopyDE;
+
+    fmtDE.format(0.0, resDE);
+    fmtCopyDE.format(0.0, resCopyDE);
+
+    if (resDE != resCopyDE) {
+        errln(UnicodeString("Error: different result by the copied instance - org:") + resDE + " copy:" + resCopyDE);
+    }
+
+    // test for assignment operator
+    fmt = fmtDE;
+
+    UnicodeString resAssigned;
+    fmt.format(0.0, resAssigned);
+
+    if (resDE != resAssigned) {
+        errln(UnicodeString("Error: different results by the assigned instance - org:") + resDE + " assigned:" + resAssigned);
+    }
+}
+
+void DateFormatRegressionTest::TestParsing(void) {
+    UErrorCode status = U_ZERO_ERROR;
+    UnicodeString pattern("EEE-WW-MMMM-yyyy");
+    UnicodeString text("mon-02-march-2011");
+    int32_t expectedDay = 7;
+
+    SimpleDateFormat format(pattern, status);
+    if (U_FAILURE(status)) {
+        dataerrln("Unable to create SimpleDateFormat - %s", u_errorName(status));
+        return;
+    }
+
+    Calendar *cal = new GregorianCalendar(status);
+    if (cal == NULL || U_FAILURE(status)) {
+        errln("Unable to create calendar - %s", u_errorName(status));
+        return;
+    }
+
+    ParsePosition pos(0);
+    format.parse(text, *cal, pos);
+
+    if (cal->get(UCAL_DAY_OF_MONTH, status) != expectedDay) {
+        errln("Parsing failed: day of month should be '7' with pattern: \"" + pattern + "\" for text: \"" + text + "\"");
+    }
+
+    delete cal;
+}
+
+void DateFormatRegressionTest::TestT10334(void) {
+    UErrorCode status = U_ZERO_ERROR;
+    UnicodeString pattern("'--: 'EEE-WW-MMMM-yyyy");
+    UnicodeString text("--mon-02-march-2011");
+    SimpleDateFormat format(pattern, status);
+
+    if (U_FAILURE(status)) {
+        dataerrln("Fail creating SimpleDateFormat object - %s", u_errorName(status));
+        return;
+    }
+
+    format.setBooleanAttribute(UDAT_PARSE_PARTIAL_MATCH, FALSE, status);
+    format.parse(text, status);
+    if (!U_FAILURE(status)) {
+        errln("parse partial match did NOT fail in strict mode - %s", u_errorName(status));
+    }
+
+    status = U_ZERO_ERROR;
+    format.setBooleanAttribute(UDAT_PARSE_PARTIAL_MATCH, TRUE, status);
+    format.parse(text, status);
+    if (U_FAILURE(status)) {
+        errln("parse partial match failure in lenient mode - %s", u_errorName(status));
+    }
+
+    status = U_ZERO_ERROR;
+    pattern = UnicodeString("YYYY MM dd");
+    text =    UnicodeString("2013 12 10");
+    format.applyPattern(pattern);
+    UDate referenceDate = format.parse(text, status);
+
+    FieldPosition fp(0);
+    UnicodeString formattedString("");
+    pattern = UnicodeString("YYYY LL dd ee cc qq QQ");
+    format.applyPattern(pattern);
+    format.format(referenceDate, formattedString, fp, status);
+    logln("ref date: " + formattedString);
+
+
+    char patternArray[] = "YYYY LLL dd eee ccc qqq QQQ";
+    pattern = UnicodeString(patternArray);
+    text = UnicodeString("2013 12 10 03 3 04 04");
+    status = U_ZERO_ERROR;
+    format.setBooleanAttribute(UDAT_PARSE_ALLOW_NUMERIC, TRUE, status);
+    format.applyPattern(pattern);
+    ParsePosition pp(0);
+    format.parse(text, pp);
+    if (pp.getErrorIndex() != -1) {
+        errln("numeric parse error");
+    }
+
+    status = U_ZERO_ERROR;
+    format.setBooleanAttribute(UDAT_PARSE_ALLOW_NUMERIC, FALSE, status);
+    format.parse(text, status);
+    if (!U_FAILURE(status)) {
+        errln("numeric parse did NOT fail in strict mode", u_errorName(status));
+    }
+
+}
+
+
+typedef struct {
+    const char * locale;
+    UBool leniency;
+    UnicodeString parseString;
+    UnicodeString pattern;
+    UnicodeString expectedResult;       // null indicates expected error
+} TestDateFormatLeniencyItem;
+
+
+void DateFormatRegressionTest::TestT10619(void) {
+    const UDate july022008 = 1215000001979.0;
+    const TestDateFormatLeniencyItem items[] = {
+        /*
+            new TestDateFormatLeniencyItem(true,       "2008-Jan 02",     "yyyy-LLL. dd",         "2008-Jan. 02"),
+            new TestDateFormatLeniencyItem(false,      "2008-Jan 03",     "yyyy-LLL. dd",         null),
+            new TestDateFormatLeniencyItem(true,       "2008-Jan--04",    "yyyy-MMM' -- 'dd",     "2008-Jan -- 04"),
+            new TestDateFormatLeniencyItem(false,      "2008-Jan--05",    "yyyy-MMM' -- 'dd",     null),
+            new TestDateFormatLeniencyItem(true,       "2008-12-31",      "yyyy-mm-dd",           "2008-12-31"),
+            new TestDateFormatLeniencyItem(false,      "6 Jan 05 2008",   "eee MMM dd yyyy",      null),
+            new TestDateFormatLeniencyItem(true,       "6 Jan 05 2008",   "eee MMM dd yyyy",      "Sat Jan 05 2008"),
+        */
+        //locale    leniency    parse String                    pattern                             expected result
+        { "en",     true,       UnicodeString("2008-07 02"),    UnicodeString("yyyy-LLLL dd"),      UnicodeString("2008-July 02") },
+        { "en",     false,      UnicodeString("2008-07 02"),    UnicodeString("yyyy-LLLL dd"),      UnicodeString("") },
+        { "en",     true,       UnicodeString("2008-Jan 02"),   UnicodeString("yyyy-LLL. dd"),      UnicodeString("2008-Jan 02") },
+        { "en",     false,      UnicodeString("2008-Jan 02"),   UnicodeString("yyyy-LLL. dd"),      UnicodeString("") },
+        { "en",     true,       UnicodeString("2008-Jan--02"),  UnicodeString("yyyy-MMM' -- 'dd"),  UnicodeString("2008-Jan 02") },
+        { "en",     false,      UnicodeString("2008-Jan--02"),  UnicodeString("yyyy-MMM' -- 'dd"),  UnicodeString("") },
+        { "en",     true,       UnicodeString("6 Jan 05 2008"), UnicodeString("eee MMM dd yyyy"),   UnicodeString("Sat Jan 05 2008") },
+        { "en",     false,      UnicodeString("6 Jan 05 2008"), UnicodeString("eee MMM dd yyyy"),   UnicodeString("") },
+        // terminator
+        { NULL,     true,       UnicodeString(""),              UnicodeString(""),                  UnicodeString("") }                
+    };
+    UErrorCode status = U_ZERO_ERROR;
+    Calendar* cal = Calendar::createInstance(status);
+    if (U_FAILURE(status)) {
+        dataerrln(UnicodeString("FAIL: Unable to create Calendar for default timezone and locale."));
+    } else {
+        cal->setTime(july022008, status);
+        const TestDateFormatLeniencyItem * itemPtr;
+        for (itemPtr = items; itemPtr->locale != NULL; itemPtr++ ) {
+                                            
+            Locale locale = Locale::createFromName(itemPtr->locale);
+            status = U_ZERO_ERROR;
+            ParsePosition pos(0);
+            SimpleDateFormat * sdmft = new SimpleDateFormat(itemPtr->pattern, locale, status);
+            if (U_FAILURE(status)) {
+                dataerrln("Unable to create SimpleDateFormat - %s", u_errorName(status));
+                continue;
+            }
+            sdmft->setLenient(itemPtr->leniency);
+            sdmft->setBooleanAttribute(UDAT_PARSE_ALLOW_WHITESPACE, itemPtr->leniency, status).setBooleanAttribute(UDAT_PARSE_ALLOW_NUMERIC, itemPtr->leniency, status);
+            /*UDate d = */sdmft->parse(itemPtr->parseString, pos);
+
+            delete sdmft;
+            if(pos.getErrorIndex() > -1) {
+                if(itemPtr->expectedResult.length() != 0) {
+                   errln("error: unexpected error - " + itemPtr->parseString + " - error index " + pos.getErrorIndex() +
+                           " - leniency " + itemPtr->leniency);
+                   continue;
+                } else {
+                   continue;
+                }
+            }
+        }
+    }
+    delete cal;
+
 }
 
 #endif /* #if !UCONFIG_NO_FORMATTING */

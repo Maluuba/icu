@@ -1,6 +1,6 @@
 /*
 ******************************************************************************
-*   Copyright (C) 1997-2008, International Business Machines
+*   Copyright (C) 1997-2014, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 ******************************************************************************
 *   file name:  nfrule.cpp
@@ -17,6 +17,7 @@
 
 #if U_HAVE_RBNF
 
+#include "unicode/localpointer.h"
 #include "unicode/rbnf.h"
 #include "unicode/tblcoll.h"
 #include "unicode/coleitr.h"
@@ -24,8 +25,7 @@
 #include "nfrs.h"
 #include "nfrlist.h"
 #include "nfsubs.h"
-
-#include "util.h"
+#include "patternprops.h"
 
 U_NAMESPACE_BEGIN
 
@@ -77,7 +77,6 @@ static const UChar gGreaterZero[] =             {0x3E, 0x30, 0};    /* ">0" */
 static const UChar gEqualPercent[] =            {0x3D, 0x25, 0};    /* "=%" */
 static const UChar gEqualHash[] =               {0x3D, 0x23, 0};    /* "=#" */
 static const UChar gEqualZero[] =               {0x3D, 0x30, 0};    /* "=0" */
-static const UChar gEmptyString[] =             {0};                /* "" */
 static const UChar gGreaterGreaterGreater[] =   {0x3E, 0x3E, 0x3E, 0}; /* ">>>" */
 
 static const UChar * const tokenStrings[] = {
@@ -235,7 +234,7 @@ NFRule::parseRuleDescriptor(UnicodeString& description, UErrorCode& status)
         descriptor.setTo(description, 0, p);
 
         ++p;
-        while (p < description.length() && uprv_isRuleWhiteSpace(description.charAt(p))) {
+        while (p < description.length() && PatternProps::isWhiteSpace(description.charAt(p))) {
             ++p;
         }
         description.removeBetween(0, p);
@@ -243,16 +242,16 @@ NFRule::parseRuleDescriptor(UnicodeString& description, UErrorCode& status)
         // check first to see if the rule descriptor matches the token
         // for one of the special rules.  If it does, set the base
         // value to the correct identfier value
-        if (descriptor == gMinusX) {
+        if (0 == descriptor.compare(gMinusX, 2)) {
             setType(kNegativeNumberRule);
         }
-        else if (descriptor == gXDotX) {
+        else if (0 == descriptor.compare(gXDotX, 3)) {
             setType(kImproperFractionRule);
         }
-        else if (descriptor == gZeroDotX) {
+        else if (0 == descriptor.compare(gZeroDotX, 3)) {
             setType(kProperFractionRule);
         }
-        else if (descriptor == gXDotZero) {
+        else if (0 == descriptor.compare(gXDotZero, 3)) {
             setType(kMasterRule);
         }
 
@@ -278,7 +277,7 @@ NFRule::parseRuleDescriptor(UnicodeString& description, UErrorCode& status)
                 else if (c == gSlash || c == gGreaterThan) {
                     break;
                 }
-                else if (uprv_isRuleWhiteSpace(c) || c == gComma || c == gDot) {
+                else if (PatternProps::isWhiteSpace(c) || c == gComma || c == gDot) {
                 }
                 else {
                     // throw new IllegalArgumentException("Illegal character in rule descriptor");
@@ -307,7 +306,7 @@ NFRule::parseRuleDescriptor(UnicodeString& description, UErrorCode& status)
                     else if (c == gGreaterThan) {
                         break;
                     }
-                    else if (uprv_isRuleWhiteSpace(c) || c == gComma || c == gDot) {
+                    else if (PatternProps::isWhiteSpace(c) || c == gComma || c == gDot) {
                     }
                     else {
                         // throw new IllegalArgumentException("Illegal character is rule descriptor");
@@ -410,12 +409,12 @@ NFRule::extractSubstitution(const NFRuleSet* ruleSet,
     // at the end of the rule text
     if (subStart == -1) {
         return NFSubstitution::makeSubstitution(ruleText.length(), this, predecessor,
-            ruleSet, rbnf, gEmptyString, status);
+            ruleSet, rbnf, UnicodeString(), status);
     }
 
     // special-case the ">>>" token, since searching for the > at the
     // end will actually find the > in the middle
-    if (ruleText.indexOf(gGreaterGreaterGreater) == subStart) {
+    if (ruleText.indexOf(gGreaterGreaterGreater, 3, 0) == subStart) {
         subEnd = subStart + 2;
 
         // otherwise the substitution token ends with the same character
@@ -438,7 +437,7 @@ NFRule::extractSubstitution(const NFRuleSet* ruleSet,
     // at the end of the rule
     if (subEnd == -1) {
         return NFSubstitution::makeSubstitution(ruleText.length(), this, predecessor,
-            ruleSet, rbnf, gEmptyString, status);
+            ruleSet, rbnf, UnicodeString(), status);
     }
 
     // if we get here, we have a real substitution token (or at least
@@ -582,10 +581,10 @@ void
 NFRule::_appendRuleText(UnicodeString& result) const
 {
     switch (getType()) {
-    case kNegativeNumberRule: result.append(gMinusX); break;
-    case kImproperFractionRule: result.append(gXDotX); break;
-    case kProperFractionRule: result.append(gZeroDotX); break;
-    case kMasterRule: result.append(gXDotZero); break;
+    case kNegativeNumberRule: result.append(gMinusX, 2); break;
+    case kImproperFractionRule: result.append(gXDotX, 3); break;
+    case kProperFractionRule: result.append(gZeroDotX, 3); break;
+    case kMasterRule: result.append(gXDotZero, 3); break;
     default:
         // for a normal rule, write out its base value, and if the radix is
         // something other than 10, write out the radix (with the preceding
@@ -610,7 +609,7 @@ NFRule::_appendRuleText(UnicodeString& result) const
     // if the rule text begins with a space, write an apostrophe
     // (whitespace after the rule descriptor is ignored; the
     // apostrophe is used to make the whitespace significant)
-    if (ruleText.startsWith(gSpace) && sub1->getPos() != 0) {
+    if (ruleText.charAt(0) == gSpace && sub1->getPos() != 0) {
         result.append(gTick);
     }
 
@@ -1138,16 +1137,17 @@ NFRule::prefixLength(const UnicodeString& str, const UnicodeString& prefix, UErr
         // isn't a RuleBasedCollator, because RuleBasedCollator defines
         // the CollationElementIterator protocol.  Hopefully, this
         // will change someday.)
-        RuleBasedCollator* collator = (RuleBasedCollator*)formatter->getCollator();
-        CollationElementIterator* strIter = collator->createCollationElementIterator(str);
-        CollationElementIterator* prefixIter = collator->createCollationElementIterator(prefix);
+        const RuleBasedCollator* collator = formatter->getCollator();
+        if (collator == NULL) {
+            status = U_MEMORY_ALLOCATION_ERROR;
+            return 0;
+        }
+        LocalPointer<CollationElementIterator> strIter(collator->createCollationElementIterator(str));
+        LocalPointer<CollationElementIterator> prefixIter(collator->createCollationElementIterator(prefix));
         // Check for memory allocation error.
-        if (collator == NULL || strIter == NULL || prefixIter == NULL) {
-        	delete collator;
-        	delete strIter;
-        	delete prefixIter;
-        	status = U_MEMORY_ALLOCATION_ERROR;
-        	return 0;
+        if (strIter.isNull() || prefixIter.isNull()) {
+            status = U_MEMORY_ALLOCATION_ERROR;
+            return 0;
         }
 
         UErrorCode err = U_ZERO_ERROR;
@@ -1199,8 +1199,6 @@ NFRule::prefixLength(const UnicodeString& str, const UnicodeString& prefix, UErr
             // if skipping over ignorables brought us to the end
             // of the target string, we didn't match and return 0
             if (oStr == CollationElementIterator::NULLORDER) {
-                delete prefixIter;
-                delete strIter;
                 return 0;
             }
 
@@ -1209,8 +1207,6 @@ NFRule::prefixLength(const UnicodeString& str, const UnicodeString& prefix, UErr
             // get a mismatch, dump out and return 0
             if (CollationElementIterator::primaryOrder(oStr)
                 != CollationElementIterator::primaryOrder(oPrefix)) {
-                delete prefixIter;
-                delete strIter;
                 return 0;
 
                 // otherwise, advance to the next character in each string
@@ -1230,9 +1226,6 @@ NFRule::prefixLength(const UnicodeString& str, const UnicodeString& prefix, UErr
 #ifdef RBNF_DEBUG
         fprintf(stderr, "prefix length: %d\n", result);
 #endif
-        delete prefixIter;
-        delete strIter;
-
         return result;
 #if 0
         //----------------------------------------------------------------
@@ -1440,15 +1433,17 @@ NFRule::allIgnorable(const UnicodeString& str, UErrorCode& status) const
     // a collation element iterator and make sure each collation
     // element is 0 (ignorable) at the primary level
     if (formatter->isLenient()) {
-        RuleBasedCollator* collator = (RuleBasedCollator*)(formatter->getCollator());
-        CollationElementIterator* iter = collator->createCollationElementIterator(str);
-        
+        const RuleBasedCollator* collator = formatter->getCollator();
+        if (collator == NULL) {
+            status = U_MEMORY_ALLOCATION_ERROR;
+            return FALSE;
+        }
+        LocalPointer<CollationElementIterator> iter(collator->createCollationElementIterator(str));
+
         // Memory allocation error check.
-        if (collator == NULL || iter == NULL) {
-        	delete collator;
-        	delete iter;
-        	status = U_MEMORY_ALLOCATION_ERROR;
-        	return FALSE;
+        if (iter.isNull()) {
+            status = U_MEMORY_ALLOCATION_ERROR;
+            return FALSE;
         }
 
         UErrorCode err = U_ZERO_ERROR;
@@ -1458,7 +1453,6 @@ NFRule::allIgnorable(const UnicodeString& str, UErrorCode& status) const
             o = iter->next(err);
         }
 
-        delete iter;
         return o == CollationElementIterator::NULLORDER;
     }
 #endif
@@ -1472,5 +1466,3 @@ U_NAMESPACE_END
 
 /* U_HAVE_RBNF */
 #endif
-
-

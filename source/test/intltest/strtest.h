@@ -1,6 +1,6 @@
 /********************************************************************
  * COPYRIGHT: 
- * Copyright (c) 1997-2010, International Business Machines Corporation and
+ * Copyright (c) 1997-2011, International Business Machines Corporation and
  * others. All Rights Reserved.
  ********************************************************************/
 /*   file name:  strtest.h
@@ -31,12 +31,15 @@ public:
     void runIndexedTest(int32_t index, UBool exec, const char *&name, char *par=NULL);
 
 private:
-    void TestEndian(void);
-    void TestSizeofTypes(void);
-    void TestCharsetFamily(void);
-    void TestStdNamespaceQualifier();
-    void TestUsingStdNamespace();
+    void TestEndian();
+    void TestSizeofTypes();
+    void TestCharsetFamily();
+    void Test_U_STRING();
+    void Test_UNICODE_STRING();
+    void Test_UNICODE_STRING_SIMPLE();
+    void Test_UTF8_COUNT_TRAIL_BYTES();
     void TestStringPiece();
+    void TestStringPieceComparisons();
     void TestByteSink();
     void TestCheckedArrayByteSink();
     void TestStringByteSink();

@@ -1,13 +1,13 @@
 ﻿// ***************************************************************************
 // *
-// * Copyright (C) 2010 International Business Machines
-// * Corporation and others.  All Rights Reserved.
-// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
-// * Source File:<path>/common/main/eo.xml
+// * Copyright (C) 2014 International Business Machines
+// * Corporation and others. All Rights Reserved.
+// * Tool: org.unicode.cldr.icu.NewLdml2IcuConverter
+// * Source File: <path>/common/main/eo.xml
 // *
 // ***************************************************************************
 /**
- *  ICU <specials> source: <path>/xml/main/eo.xml
+ * ICU <specials> source: <path>/common/main/eo.xml
  */
 eo{
     AuxExemplarCharacters{"[q w x y]"}
@@ -24,8 +24,25 @@ eo{
             }
         }
     }
-    Version{"2.0.47.67"}
+    Version{"2.0.97.91"}
     calendar{
+        generic{
+            DateTimePatterns{
+                "H-'a' 'horo' 'kaj' m:ss zzzz",
+                "HH:mm:ss z",
+                "HH:mm:ss",
+                "HH:mm",
+                "EEEE, d-'a' 'de' MMMM y G",
+                "G y-MMMM-dd",
+                "G y-MMM-dd",
+                "GGGGG y-MM-dd",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+        }
         gregorian{
             AmPmMarkers{
                 "atm",

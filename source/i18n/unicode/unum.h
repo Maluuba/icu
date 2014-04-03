@@ -1,6 +1,6 @@
 /*
 *******************************************************************************
-* Copyright (C) 1997-2010, International Business Machines Corporation and others.
+* Copyright (C) 1997-2014, International Business Machines Corporation and others.
 * All Rights Reserved.
 * Modification History:
 *
@@ -20,6 +20,9 @@
 #include "unicode/uloc.h"
 #include "unicode/umisc.h"
 #include "unicode/parseerr.h"
+#include "unicode/uformattable.h"
+#include "unicode/udisplaycontext.h"
+
 /**
  * \file
  * \brief C API: NumberFormat
@@ -107,7 +110,7 @@
  * formatters.
  * <P>
  * You can also control the display of numbers with such function as
- * unum_getAttribues() and unum_setAtributes(), which let you set the
+ * unum_getAttributes() and unum_setAttributes(), which let you set the
  * miminum fraction digits, grouping, etc.
  * @see UNumberFormatAttributes for more details
  * <P>
@@ -134,19 +137,34 @@ typedef void* UNumberFormat;
  */
 typedef enum UNumberFormatStyle {
     /**
-     * Decimal format defined by pattern 
+     * Decimal format defined by a pattern string.
      * @stable ICU 3.0
      */
     UNUM_PATTERN_DECIMAL=0,
-    /** Decimal format */
+    /**
+     * Decimal format ("normal" style).
+     * @stable ICU 2.0
+     */
     UNUM_DECIMAL=1,
-    /** Currency format */
+    /**
+     * Currency format with a currency symbol, e.g., "$1.00".
+     * @stable ICU 2.0
+     */
     UNUM_CURRENCY,
-    /** Percent format */
+    /**
+     * Percent format
+     * @stable ICU 2.0
+     */
     UNUM_PERCENT,
-    /** Scientific format */
+    /**
+     * Scientific format
+     * @stable ICU 2.1
+     */
     UNUM_SCIENTIFIC,
-    /** Spellout rule-based format */
+    /**
+     * Spellout rule-based format
+     * @stable ICU 2.0
+     */
     UNUM_SPELLOUT,
     /** 
      * Ordinal rule-based format 
@@ -159,18 +177,48 @@ typedef enum UNumberFormatStyle {
      */
     UNUM_DURATION,
     /** 
-     * Numbering system rule-based format 
-     * @draft ICU 4.2
+     * Numbering system rule-based format
+     * @stable ICU 4.2
      */
     UNUM_NUMBERING_SYSTEM,
     /** 
-     * Rule-based format defined by pattern 
+     * Rule-based format defined by a pattern string.
      * @stable ICU 3.0
      */
     UNUM_PATTERN_RULEBASED,
-    /** Default format */
+    /**
+     * Currency format with an ISO currency code, e.g., "USD1.00".
+     * @stable ICU 4.8
+     */
+    UNUM_CURRENCY_ISO,
+    /**
+     * Currency format with a pluralized currency name,
+     * e.g., "1.00 US dollar" and "3.00 US dollars".
+     * @stable ICU 4.8
+     */
+    UNUM_CURRENCY_PLURAL,
+#ifndef U_HIDE_DRAFT_API
+    /**
+     * Currency format for accounting, e.g., "($3.00)" for
+     * negative currency amount instead of "-$3.00" ({@link #UNUM_CURRENCY}).
+     * @draft ICU 53
+     */
+    UNUM_CURRENCY_ACCOUNTING = UNUM_CURRENCY_PLURAL+1,
+#endif /* U_HIDE_DRAFT_API */
+    /**
+     * One more than the highest number format style constant.
+     * @stable ICU 4.8
+     */
+    UNUM_FORMAT_STYLE_COUNT = UNUM_CURRENCY_PLURAL+2,
+    /**
+     * Default format
+     * @stable ICU 2.0
+     */
     UNUM_DEFAULT = UNUM_DECIMAL,
-    /** (Alias for UNUM_PATTERN_DECIMAL) */
+    /**
+     * Alias for UNUM_PATTERN_DECIMAL
+     * @stable ICU 3.0
+     */
     UNUM_IGNORE = UNUM_PATTERN_DECIMAL
 } UNumberFormatStyle;
 
@@ -183,17 +231,24 @@ typedef enum UNumberFormatRoundingMode {
     UNUM_ROUND_DOWN,
     UNUM_ROUND_UP,
     /**
-     * Half-even rounding, misspelled name
-     * @deprecated, ICU 3.8
-     */
-    UNUM_FOUND_HALFEVEN,
-    UNUM_ROUND_HALFDOWN,
-    UNUM_ROUND_HALFUP,
-    /**
      * Half-even rounding
      * @stable, ICU 3.8
      */
-    UNUM_ROUND_HALFEVEN = UNUM_FOUND_HALFEVEN
+    UNUM_ROUND_HALFEVEN,
+#ifndef U_HIDE_DEPRECATED_API
+    /**
+     * Half-even rounding, misspelled name
+     * @deprecated, ICU 3.8
+     */
+    UNUM_FOUND_HALFEVEN = UNUM_ROUND_HALFEVEN,
+#endif  /* U_HIDE_DEPRECATED_API */
+    UNUM_ROUND_HALFDOWN = UNUM_ROUND_HALFEVEN + 1,
+    UNUM_ROUND_HALFUP,
+    /** 
+      * ROUND_UNNECESSARY reports an error if formatted result is not exact.
+      * @stable ICU 4.8
+      */
+    UNUM_ROUND_UNNECESSARY
 } UNumberFormatRoundingMode;
 
 /** The possible number format pad positions. 
@@ -207,13 +262,77 @@ typedef enum UNumberFormatPadPosition {
 } UNumberFormatPadPosition;
 
 /**
+ * Constants for specifying short or long format.
+ * @stable ICU 51
+ */
+typedef enum UNumberCompactStyle {
+  /** @stable ICU 51 */
+  UNUM_SHORT,
+  /** @stable ICU 51 */
+  UNUM_LONG
+  /** @stable ICU 51 */
+} UNumberCompactStyle;
+
+/**
+ * Constants for specifying currency spacing
+ * @stable ICU 4.8
+ */
+enum UCurrencySpacing {
+    /** @stable ICU 4.8 */
+    UNUM_CURRENCY_MATCH,
+    /** @stable ICU 4.8 */
+    UNUM_CURRENCY_SURROUNDING_MATCH,
+    /** @stable ICU 4.8 */
+    UNUM_CURRENCY_INSERT,
+    /** @stable ICU 4.8 */
+    UNUM_CURRENCY_SPACING_COUNT
+};
+typedef enum UCurrencySpacing UCurrencySpacing; /**< @stable ICU 4.8 */
+
+
+/**
+ * FieldPosition and UFieldPosition selectors for format fields
+ * defined by NumberFormat and UNumberFormat.
+ * @stable ICU 49
+ */
+typedef enum UNumberFormatFields {
+    /** @stable ICU 49 */
+    UNUM_INTEGER_FIELD,
+    /** @stable ICU 49 */
+    UNUM_FRACTION_FIELD,
+    /** @stable ICU 49 */
+    UNUM_DECIMAL_SEPARATOR_FIELD,
+    /** @stable ICU 49 */
+    UNUM_EXPONENT_SYMBOL_FIELD,
+    /** @stable ICU 49 */
+    UNUM_EXPONENT_SIGN_FIELD,
+    /** @stable ICU 49 */
+    UNUM_EXPONENT_FIELD,
+    /** @stable ICU 49 */
+    UNUM_GROUPING_SEPARATOR_FIELD,
+    /** @stable ICU 49 */
+    UNUM_CURRENCY_FIELD,
+    /** @stable ICU 49 */
+    UNUM_PERCENT_FIELD,
+    /** @stable ICU 49 */
+    UNUM_PERMILL_FIELD,
+    /** @stable ICU 49 */
+    UNUM_SIGN_FIELD,
+    /** @stable ICU 49 */
+    UNUM_FIELD_COUNT
+} UNumberFormatFields;
+
+
+/**
  * Create and return a new UNumberFormat for formatting and parsing
  * numbers.  A UNumberFormat may be used to format numbers by calling
  * {@link #unum_format }, and to parse numbers by calling {@link #unum_parse }.
  * The caller must call {@link #unum_close } when done to release resources
  * used by this object.
  * @param style The type of number format to open: one of
- * UNUM_DECIMAL, UNUM_CURRENCY, UNUM_PERCENT, UNUM_SCIENTIFIC, UNUM_SPELLOUT,
+ * UNUM_DECIMAL, UNUM_CURRENCY, UNUM_PERCENT, UNUM_SCIENTIFIC,
+ * UNUM_CURRENCY_ISO, UNUM_CURRENCY_PLURAL, UNUM_SPELLOUT,
+ * UNUM_ORDINAL, UNUM_DURATION, UNUM_NUMBERING_SYSTEM,
  * UNUM_PATTERN_DECIMAL, UNUM_PATTERN_RULEBASED, or UNUM_DEFAULT.
  * If UNUM_PATTERN_DECIMAL or UNUM_PATTERN_RULEBASED is passed then the
  * number format is opened using the given pattern, which must conform
@@ -266,7 +385,7 @@ U_NAMESPACE_BEGIN
  *
  * @see LocalPointerBase
  * @see LocalPointer
- * @draft ICU 4.4
+ * @stable ICU 4.4
  */
 U_DEFINE_LOCAL_OPEN_POINTER(LocalUNumberFormatPointer, UNumberFormat, unum_close);
 
@@ -291,7 +410,10 @@ unum_clone(const UNumberFormat *fmt,
 * The integer will be formatted according to the UNumberFormat's locale.
 * @param fmt The formatter to use.
 * @param number The number to format.
-* @param result A pointer to a buffer to receive the formatted number.
+* @param result A pointer to a buffer to receive the NULL-terminated formatted number. If
+* the formatted number fits into dest but cannot be NULL-terminated (length == resultLength)
+* then the error code is set to U_STRING_NOT_TERMINATED_WARNING. If the formatted number
+* doesn't fit into result then the error code is set to U_BUFFER_OVERFLOW_ERROR.
 * @param resultLength The maximum size of result.
 * @param pos    A pointer to a UFieldPosition.  On input, position->field
 * is read.  On output, position->beginIndex and position->endIndex indicate
@@ -320,7 +442,10 @@ unum_format(    const    UNumberFormat*    fmt,
 * The int64 will be formatted according to the UNumberFormat's locale.
 * @param fmt The formatter to use.
 * @param number The number to format.
-* @param result A pointer to a buffer to receive the formatted number.
+* @param result A pointer to a buffer to receive the NULL-terminated formatted number. If
+* the formatted number fits into dest but cannot be NULL-terminated (length == resultLength)
+* then the error code is set to U_STRING_NOT_TERMINATED_WARNING. If the formatted number
+* doesn't fit into result then the error code is set to U_BUFFER_OVERFLOW_ERROR.
 * @param resultLength The maximum size of result.
 * @param pos    A pointer to a UFieldPosition.  On input, position->field
 * is read.  On output, position->beginIndex and position->endIndex indicate
@@ -349,7 +474,10 @@ unum_formatInt64(const UNumberFormat *fmt,
 * The double will be formatted according to the UNumberFormat's locale.
 * @param fmt The formatter to use.
 * @param number The number to format.
-* @param result A pointer to a buffer to receive the formatted number.
+* @param result A pointer to a buffer to receive the NULL-terminated formatted number. If
+* the formatted number fits into dest but cannot be NULL-terminated (length == resultLength)
+* then the error code is set to U_STRING_NOT_TERMINATED_WARNING. If the formatted number
+* doesn't fit into result then the error code is set to U_BUFFER_OVERFLOW_ERROR.
 * @param resultLength The maximum size of result.
 * @param pos    A pointer to a UFieldPosition.  On input, position->field
 * is read.  On output, position->beginIndex and position->endIndex indicate
@@ -382,7 +510,10 @@ unum_formatDouble(    const    UNumberFormat*  fmt,
 * @param fmt The formatter to use.
 * @param number The number to format.
 * @param length The length of the input number, or -1 if the input is nul-terminated.
-* @param result A pointer to a buffer to receive the formatted number.
+* @param result A pointer to a buffer to receive the NULL-terminated formatted number. If
+* the formatted number fits into dest but cannot be NULL-terminated (length == resultLength)
+* then the error code is set to U_STRING_NOT_TERMINATED_WARNING. If the formatted number
+* doesn't fit into result then the error code is set to U_BUFFER_OVERFLOW_ERROR.
 * @param resultLength The maximum size of result.
 * @param pos    A pointer to a UFieldPosition.  On input, position->field
 *               is read.  On output, position->beginIndex and position->endIndex indicate
@@ -396,9 +527,9 @@ unum_formatDouble(    const    UNumberFormat*  fmt,
 * @see unum_parseInt64
 * @see unum_parseDouble
 * @see UFieldPosition
-* @draft ICU 4.4 
+* @stable ICU 4.4 
 */
-U_DRAFT int32_t U_EXPORT2 
+U_STABLE int32_t U_EXPORT2 
 unum_formatDecimal(    const    UNumberFormat*  fmt,
             const char *    number,
             int32_t         length,
@@ -413,7 +544,10 @@ unum_formatDecimal(    const    UNumberFormat*  fmt,
  * @param fmt the formatter to use
  * @param number the number to format
  * @param currency the 3-letter null-terminated ISO 4217 currency code
- * @param result a pointer to the buffer to receive the formatted number
+ * @param result A pointer to a buffer to receive the NULL-terminated formatted number. If
+ * the formatted number fits into dest but cannot be NULL-terminated (length == resultLength)
+ * then the error code is set to U_STRING_NOT_TERMINATED_WARNING. If the formatted number
+ * doesn't fit into result then the error code is set to U_BUFFER_OVERFLOW_ERROR.
  * @param resultLength the maximum number of UChars to write to result
  * @param pos a pointer to a UFieldPosition.  On input,
  * position->field is read.  On output, position->beginIndex and
@@ -428,14 +562,44 @@ unum_formatDecimal(    const    UNumberFormat*  fmt,
  * @see UFieldPosition
  * @stable ICU 3.0
  */
-U_STABLE int32_t U_EXPORT2 
+U_STABLE int32_t U_EXPORT2
 unum_formatDoubleCurrency(const UNumberFormat* fmt,
                           double number,
                           UChar* currency,
                           UChar* result,
                           int32_t resultLength,
-                          UFieldPosition* pos, /* ignored if 0 */
+                          UFieldPosition* pos,
                           UErrorCode* status);
+
+#ifndef U_HIDE_DRAFT_API
+/**
+ * Format a UFormattable into a string.
+ * @param fmt the formatter to use
+ * @param number the number to format, as a UFormattable
+ * @param result A pointer to a buffer to receive the NULL-terminated formatted number. If
+ * the formatted number fits into dest but cannot be NULL-terminated (length == resultLength)
+ * then the error code is set to U_STRING_NOT_TERMINATED_WARNING. If the formatted number
+ * doesn't fit into result then the error code is set to U_BUFFER_OVERFLOW_ERROR.
+ * @param resultLength the maximum number of UChars to write to result
+ * @param pos a pointer to a UFieldPosition.  On input,
+ * position->field is read.  On output, position->beginIndex and
+ * position->endIndex indicate the beginning and ending indices of
+ * field number position->field, if such a field exists.  This
+ * parameter may be NULL, in which case it is ignored.
+ * @param status a pointer to an input-output UErrorCode
+ * @return the total buffer size needed; if greater than resultLength,
+ * the output was truncated. Will return 0 on error.
+ * @see unum_parseToUFormattable
+ * @draft ICU 52
+ */
+U_DRAFT int32_t U_EXPORT2
+unum_formatUFormattable(const UNumberFormat* fmt,
+                        const UFormattable *number,
+                        UChar *result,
+                        int32_t resultLength,
+                        UFieldPosition *pos,
+                        UErrorCode *status);
+#endif  /* U_HIDE_DRAFT_API */
 
 /**
 * Parse a string into an integer using a UNumberFormat.
@@ -443,8 +607,8 @@ unum_formatDoubleCurrency(const UNumberFormat* fmt,
 * @param fmt The formatter to use.
 * @param text The text to parse.
 * @param textLength The length of text, or -1 if null-terminated.
-* @param parsePos If not 0, on input a pointer to an integer specifying the offset at which
-* to begin parsing.  If not 0, on output the offset at which parsing ended.
+* @param parsePos If not NULL, on input a pointer to an integer specifying the offset at which
+* to begin parsing.  If not NULL, on output the offset at which parsing ended.
 * @param status A pointer to an UErrorCode to receive any errors
 * @return The value of the parsed integer
 * @see unum_parseInt64
@@ -467,8 +631,8 @@ unum_parse(    const   UNumberFormat*  fmt,
 * @param fmt The formatter to use.
 * @param text The text to parse.
 * @param textLength The length of text, or -1 if null-terminated.
-* @param parsePos If not 0, on input a pointer to an integer specifying the offset at which
-* to begin parsing.  If not 0, on output the offset at which parsing ended.
+* @param parsePos If not NULL, on input a pointer to an integer specifying the offset at which
+* to begin parsing.  If not NULL, on output the offset at which parsing ended.
 * @param status A pointer to an UErrorCode to receive any errors
 * @return The value of the parsed integer
 * @see unum_parse
@@ -491,8 +655,8 @@ unum_parseInt64(const UNumberFormat*  fmt,
 * @param fmt The formatter to use.
 * @param text The text to parse.
 * @param textLength The length of text, or -1 if null-terminated.
-* @param parsePos If not 0, on input a pointer to an integer specifying the offset at which
-* to begin parsing.  If not 0, on output the offset at which parsing ended.
+* @param parsePos If not NULL, on input a pointer to an integer specifying the offset at which
+* to begin parsing.  If not NULL, on output the offset at which parsing ended.
 * @param status A pointer to an UErrorCode to receive any errors
 * @return The value of the parsed double
 * @see unum_parse
@@ -519,8 +683,8 @@ unum_parseDouble(    const   UNumberFormat*  fmt,
 * @param fmt The formatter to use.
 * @param text The text to parse.
 * @param textLength The length of text, or -1 if null-terminated.
-* @param parsePos If not 0, on input a pointer to an integer specifying the offset at which
-*                 to begin parsing.  If not 0, on output the offset at which parsing ended.
+* @param parsePos If not NULL, on input a pointer to an integer specifying the offset at which
+*                 to begin parsing.  If not NULL, on output the offset at which parsing ended.
 * @param outBuf A (char *) buffer to receive the parsed number as a string.  The output string
 *               will be nul-terminated if there is sufficient space.
 * @param outBufLength The size of the output buffer.  May be zero, in which case
@@ -533,9 +697,9 @@ unum_parseDouble(    const   UNumberFormat*  fmt,
 * @see unum_format
 * @see unum_formatInt64
 * @see unum_formatDouble
-* @draft ICU 4.4
+* @stable ICU 4.4
 */
-U_DRAFT int32_t U_EXPORT2 
+U_STABLE int32_t U_EXPORT2 
 unum_parseDecimal(const   UNumberFormat*  fmt,
                  const   UChar*          text,
                          int32_t         textLength,
@@ -552,7 +716,7 @@ unum_parseDecimal(const   UNumberFormat*  fmt,
  * @param textLength the length of text, or -1 if null-terminated
  * @param parsePos a pointer to an offset index into text at which to
  * begin parsing. On output, *parsePos will point after the last
- * parsed character.  This parameter may be 0, in which case parsing
+ * parsed character.  This parameter may be NULL, in which case parsing
  * begins at offset 0.
  * @param currency a pointer to the buffer to receive the parsed null-
  * terminated currency.  This buffer must have a capacity of at least
@@ -571,9 +735,37 @@ unum_parseDoubleCurrency(const UNumberFormat* fmt,
                          UChar* currency,
                          UErrorCode* status);
 
+#ifndef U_HIDE_DRAFT_API
+/**
+ * Parse a UChar string into a UFormattable.
+ * Example code:
+ * \snippet test/cintltst/cnumtst.c unum_parseToUFormattable
+ * @param fmt the formatter to use
+ * @param result the UFormattable to hold the result. If NULL, a new UFormattable will be allocated (which the caller must close with ufmt_close).
+ * @param text the text to parse
+ * @param textLength the length of text, or -1 if null-terminated
+ * @param parsePos a pointer to an offset index into text at which to
+ * begin parsing. On output, *parsePos will point after the last
+ * parsed character.  This parameter may be NULL in which case parsing
+ * begins at offset 0.
+ * @param status a pointer to an input-output UErrorCode
+ * @return the UFormattable.  Will be ==result unless NULL was passed in for result, in which case it will be the newly opened UFormattable.
+ * @see ufmt_getType
+ * @see ufmt_close
+ * @draft ICU 52
+ */
+U_DRAFT UFormattable* U_EXPORT2
+unum_parseToUFormattable(const UNumberFormat* fmt,
+                         UFormattable *result,
+                         const UChar* text,
+                         int32_t textLength,
+                         int32_t* parsePos, /* 0 = start */
+                         UErrorCode* status);
+#endif  /* U_HIDE_DRAFT_API */
+
 /**
  * Set the pattern used by a UNumberFormat.  This can only be used
- * on a DecimalFormat, other formats return U_ILLEGAL_ARGUMENT_ERROR
+ * on a DecimalFormat, other formats return U_UNSUPPORTED_ERROR
  * in the status.
  * @param format The formatter to set.
  * @param localized TRUE if the pattern is localized, FALSE otherwise.
@@ -621,6 +813,23 @@ unum_getAvailable(int32_t localeIndex);
 U_STABLE int32_t U_EXPORT2 
 unum_countAvailable(void);
 
+#if UCONFIG_HAVE_PARSEALLINPUT
+/* The UNumberFormatAttributeValue type cannot be #ifndef U_HIDE_INTERNAL_API, needed for .h variable declaration */
+/**
+ * @internal
+ */
+typedef enum UNumberFormatAttributeValue {
+#ifndef U_HIDE_INTERNAL_API
+  /** @internal */
+  UNUM_NO = 0,
+  /** @internal */
+  UNUM_YES = 1,
+  /** @internal */
+  UNUM_MAYBE = 2
+#endif /* U_HIDE_INTERNAL_API */
+} UNumberFormatAttributeValue;
+#endif
+
 /** The possible UNumberFormat numeric attributes @stable ICU 2.0 */
 typedef enum UNumberFormatAttribute {
   /** Parse integers only */
@@ -667,7 +876,55 @@ typedef enum UNumberFormatAttribute {
   /** Lenient parse mode used by rule-based formats.
    * @stable ICU 3.0
    */
-  UNUM_LENIENT_PARSE
+  UNUM_LENIENT_PARSE,
+#if UCONFIG_HAVE_PARSEALLINPUT
+  /** Consume all input. (may use fastpath). Set to UNUM_YES (require fastpath), UNUM_NO (skip fastpath), or UNUM_MAYBE (heuristic).
+   * This is an internal ICU API. Do not use.
+   * @internal
+   */
+  UNUM_PARSE_ALL_INPUT = UNUM_LENIENT_PARSE + 1,
+#endif
+  /** 
+    * Scale, which adjusts the position of the
+    * decimal point when formatting.  Amounts will be multiplied by 10 ^ (scale)
+    * before they are formatted.  The default value for the scale is 0 ( no adjustment ).
+    *
+    * <p>Example: setting the scale to 3, 123 formats as "123,000"
+    * <p>Example: setting the scale to -4, 123 formats as "0.0123"
+    *
+   * @stable ICU 51 */
+  UNUM_SCALE = UNUM_LENIENT_PARSE + 2,
+
+#ifndef U_HIDE_INTERNAL_API
+  /** Count of "regular" numeric attributes.
+   * @internal */
+  UNUM_NUMERIC_ATTRIBUTE_COUNT = UNUM_LENIENT_PARSE + 3,
+#endif  /* U_HIDE_INTERNAL_API */
+
+  /* The following cannot be #ifndef U_HIDE_INTERNAL_API, needed in .h file variable declararions */
+  /** One below the first bitfield-boolean item.
+   * All items after this one are stored in boolean form.
+   * @internal */
+  UNUM_MAX_NONBOOLEAN_ATTRIBUTE = 0x0FFF,
+
+  /** If 1, specifies that if setting the "max integer digits" attribute would truncate a value, set an error status rather than silently truncating.
+   * For example,  formatting the value 1234 with 4 max int digits would succeed, but formatting 12345 would fail. There is no effect on parsing.
+   * Default: 0 (not set)
+   * @stable ICU 50
+   */
+  UNUM_FORMAT_FAIL_IF_MORE_THAN_MAX_DIGITS = 0x1000,
+  /** 
+   * if this attribute is set to 1, specifies that, if the pattern doesn't contain an exponent, the exponent will not be parsed. If the pattern does contain an exponent, this attribute has no effect.
+   * Has no effect on formatting.
+   * Default: 0 (unset)
+   * @stable ICU 50
+   */
+  UNUM_PARSE_NO_EXPONENT,
+
+  /* The following cannot be #ifndef U_HIDE_INTERNAL_API, needed in .h file variable declararions */
+  /** Limit of boolean attributes.
+   * @internal */
+  UNUM_LIMIT_BOOLEAN_ATTRIBUTE
 } UNumberFormatAttribute;
 
 /**
@@ -677,7 +934,8 @@ typedef enum UNumberFormatAttribute {
 * @param attr The attribute to query; one of UNUM_PARSE_INT_ONLY, UNUM_GROUPING_USED,
 * UNUM_DECIMAL_ALWAYS_SHOWN, UNUM_MAX_INTEGER_DIGITS, UNUM_MIN_INTEGER_DIGITS, UNUM_INTEGER_DIGITS,
 * UNUM_MAX_FRACTION_DIGITS, UNUM_MIN_FRACTION_DIGITS, UNUM_FRACTION_DIGITS, UNUM_MULTIPLIER,
-* UNUM_GROUPING_SIZE, UNUM_ROUNDING_MODE, UNUM_FORMAT_WIDTH, UNUM_PADDING_POSITION, UNUM_SECONDARY_GROUPING_SIZE.
+* UNUM_GROUPING_SIZE, UNUM_ROUNDING_MODE, UNUM_FORMAT_WIDTH, UNUM_PADDING_POSITION, UNUM_SECONDARY_GROUPING_SIZE,
+* UNUM_SCALE.
 * @return The value of attr.
 * @see unum_setAttribute
 * @see unum_getDoubleAttribute
@@ -700,7 +958,7 @@ unum_getAttribute(const UNumberFormat*          fmt,
 * UNUM_DECIMAL_ALWAYS_SHOWN, UNUM_MAX_INTEGER_DIGITS, UNUM_MIN_INTEGER_DIGITS, UNUM_INTEGER_DIGITS,
 * UNUM_MAX_FRACTION_DIGITS, UNUM_MIN_FRACTION_DIGITS, UNUM_FRACTION_DIGITS, UNUM_MULTIPLIER,
 * UNUM_GROUPING_SIZE, UNUM_ROUNDING_MODE, UNUM_FORMAT_WIDTH, UNUM_PADDING_POSITION, UNUM_SECONDARY_GROUPING_SIZE,
-* or UNUM_LENIENT_PARSE.
+* UNUM_LENIENT_PARSE, or UNUM_SCALE.
 * @param newValue The new value of attr.
 * @see unum_getAttribute
 * @see unum_getDoubleAttribute
@@ -783,7 +1041,7 @@ typedef enum UNumberFormatTextAttribute {
 /**
 * Get a text attribute associated with a UNumberFormat.
 * An example of a text attribute is the suffix for positive numbers.  If the formatter
-* does not understand the attributre, U_UNSUPPORTED_ERROR is returned as the status.
+* does not understand the attribute, U_UNSUPPORTED_ERROR is returned as the status.
 * Rule-based formatters only understand UNUM_DEFAULT_RULESET and UNUM_PUBLIC_RULESETS.
 * @param fmt The formatter to query.
 * @param tag The attribute to query; one of UNUM_POSITIVE_PREFIX, UNUM_POSITIVE_SUFFIX,
@@ -895,41 +1153,41 @@ typedef enum UNumberFormatSymbol {
   /** The monetary grouping separator 
    * @stable ICU 3.6
    */
-  UNUM_MONETARY_GROUPING_SEPARATOR_SYMBOL = 17,  
+  UNUM_MONETARY_GROUPING_SEPARATOR_SYMBOL = 17,
   /** One
-   * @draft ICU 4.6
+   * @stable ICU 4.6
    */
   UNUM_ONE_DIGIT_SYMBOL = 18,
   /** Two
-   * @draft ICU 4.6
+   * @stable ICU 4.6
    */
   UNUM_TWO_DIGIT_SYMBOL = 19,
   /** Three
-   * @draft ICU 4.6
+   * @stable ICU 4.6
    */
   UNUM_THREE_DIGIT_SYMBOL = 20,
   /** Four
-   * @draft ICU 4.6
+   * @stable ICU 4.6
    */
   UNUM_FOUR_DIGIT_SYMBOL = 21,
   /** Five
-   * @draft ICU 4.6
+   * @stable ICU 4.6
    */
   UNUM_FIVE_DIGIT_SYMBOL = 22,
   /** Six
-   * @draft ICU 4.6
+   * @stable ICU 4.6
    */
   UNUM_SIX_DIGIT_SYMBOL = 23,
   /** Seven
-    * @draft ICU 4.6
+    * @stable ICU 4.6
    */
   UNUM_SEVEN_DIGIT_SYMBOL = 24,
   /** Eight
-   * @draft ICU 4.6
+   * @stable ICU 4.6
    */
   UNUM_EIGHT_DIGIT_SYMBOL = 25,
   /** Nine
-   * @draft ICU 4.6
+   * @stable ICU 4.6
    */
   UNUM_NINE_DIGIT_SYMBOL = 26,
   /** count symbol constants */
@@ -993,6 +1251,32 @@ U_STABLE const char* U_EXPORT2
 unum_getLocaleByType(const UNumberFormat *fmt,
                      ULocDataLocaleType type,
                      UErrorCode* status); 
+
+#ifndef U_HIDE_DRAFT_API
+/**
+ * Set a particular UDisplayContext value in the formatter, such as
+ * UDISPCTX_CAPITALIZATION_FOR_STANDALONE.
+ * @param fmt The formatter for which to set a UDisplayContext value.
+ * @param value The UDisplayContext value to set.
+ * @param status A pointer to an UErrorCode to receive any errors
+ * @draft ICU 53
+ */
+U_DRAFT void U_EXPORT2
+unum_setContext(UNumberFormat* fmt, UDisplayContext value, UErrorCode* status);
+
+/**
+ * Get the formatter's UDisplayContext value for the specified UDisplayContextType,
+ * such as UDISPCTX_TYPE_CAPITALIZATION.
+ * @param fmt The formatter to query.
+ * @param type The UDisplayContextType whose value to return
+ * @param status A pointer to an UErrorCode to receive any errors
+ * @return The UDisplayContextValue for the specified type.
+ * @draft ICU 53
+ */
+U_DRAFT UDisplayContext U_EXPORT2
+unum_getContext(const UNumberFormat *fmt, UDisplayContextType type, UErrorCode* status);
+
+#endif  /* U_HIDE_DRAFT_API */
 
 #endif /* #if !UCONFIG_NO_FORMATTING */
 

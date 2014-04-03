@@ -1,6 +1,6 @@
 /*
 *******************************************************************************
-* Copyright (C) 2007-2010, International Business Machines Corporation and
+* Copyright (C) 2007-2013, International Business Machines Corporation and
 * others. All Rights Reserved.
 *******************************************************************************
 */
@@ -34,8 +34,8 @@ BasicTimeZone::~BasicTimeZone() {
 }
 
 UBool
-BasicTimeZone::hasEquivalentTransitions(/*const*/ BasicTimeZone& tz, UDate start, UDate end,
-                                        UBool ignoreDstAmount, UErrorCode& status) /*const*/ {
+BasicTimeZone::hasEquivalentTransitions(const BasicTimeZone& tz, UDate start, UDate end,
+                                        UBool ignoreDstAmount, UErrorCode& status) const {
     if (U_FAILURE(status)) {
         return FALSE;
     }
@@ -72,17 +72,27 @@ BasicTimeZone::hasEquivalentTransitions(/*const*/ BasicTimeZone& tz, UDate start
 
         if (ignoreDstAmount) {
             // Skip a transition which only differ the amount of DST savings
-            if (avail1
-                    && (tr1.getFrom()->getRawOffset() + tr1.getFrom()->getDSTSavings()
-                            == tr1.getTo()->getRawOffset() + tr1.getTo()->getDSTSavings())
-                    && (tr1.getFrom()->getDSTSavings() != 0 && tr1.getTo()->getDSTSavings() != 0)) {
-                getNextTransition(tr1.getTime(), FALSE, tr1);
+            while (TRUE) {
+                if (avail1
+                        && tr1.getTime() <= end
+                        && (tr1.getFrom()->getRawOffset() + tr1.getFrom()->getDSTSavings()
+                                == tr1.getTo()->getRawOffset() + tr1.getTo()->getDSTSavings())
+                        && (tr1.getFrom()->getDSTSavings() != 0 && tr1.getTo()->getDSTSavings() != 0)) {
+                    getNextTransition(tr1.getTime(), FALSE, tr1);
+                } else {
+                    break;
+                }
             }
-            if (avail2
-                    && (tr2.getFrom()->getRawOffset() + tr2.getFrom()->getDSTSavings()
-                            == tr2.getTo()->getRawOffset() + tr2.getTo()->getDSTSavings())
-                    && (tr2.getFrom()->getDSTSavings() != 0 && tr2.getTo()->getDSTSavings() != 0)) {
-                getNextTransition(tr2.getTime(), FALSE, tr2);
+            while (TRUE) {
+                if (avail2
+                        && tr2.getTime() <= end
+                        && (tr2.getFrom()->getRawOffset() + tr2.getFrom()->getDSTSavings()
+                                == tr2.getTo()->getRawOffset() + tr2.getTo()->getDSTSavings())
+                        && (tr2.getFrom()->getDSTSavings() != 0 && tr2.getTo()->getDSTSavings() != 0)) {
+                    tz.getNextTransition(tr2.getTime(), FALSE, tr2);
+                } else {
+                    break;
+                }
             }
         }
 
@@ -118,7 +128,7 @@ BasicTimeZone::hasEquivalentTransitions(/*const*/ BasicTimeZone& tz, UDate start
 
 void
 BasicTimeZone::getSimpleRulesNear(UDate date, InitialTimeZoneRule*& initial,
-        AnnualTimeZoneRule*& std, AnnualTimeZoneRule*& dst, UErrorCode& status) /*const*/ {
+        AnnualTimeZoneRule*& std, AnnualTimeZoneRule*& dst, UErrorCode& status) const {
     initial = NULL;
     std = NULL;
     dst = NULL;
@@ -275,7 +285,7 @@ BasicTimeZone::getSimpleRulesNear(UDate date, InitialTimeZoneRule*& initial,
 
 void
 BasicTimeZone::getTimeZoneRulesAfter(UDate start, InitialTimeZoneRule*& initial,
-                                     UVector*& transitionRules, UErrorCode& status) /*const*/ {
+                                     UVector*& transitionRules, UErrorCode& status) const {
     if (U_FAILURE(status)) {
         return;
     }
@@ -536,7 +546,7 @@ error:
 
 void
 BasicTimeZone::getOffsetFromLocal(UDate /*date*/, int32_t /*nonExistingTimeOpt*/, int32_t /*duplicatedTimeOpt*/,
-                            int32_t& /*rawOffset*/, int32_t& /*dstOffset*/, UErrorCode& status) /*const*/ {
+                            int32_t& /*rawOffset*/, int32_t& /*dstOffset*/, UErrorCode& status) const {
     if (U_FAILURE(status)) {
         return;
     }

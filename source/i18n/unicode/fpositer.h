@@ -1,6 +1,6 @@
 /*
 ********************************************************************************
-*   Copyright (C) 2010, International Business Machines
+*   Copyright (C) 2010-2012, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 ********************************************************************************
 *
@@ -48,26 +48,26 @@ class UVector32;
 /**
  * FieldPositionIterator returns the field ids and their start/limit positions generated
  * by a call to Format::format.  See Format, NumberFormat, DecimalFormat.
- * @draft ICU 4.4
+ * @stable ICU 4.4
  */
 class U_I18N_API FieldPositionIterator : public UObject {
 public:
     /**
      * Destructor.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     ~FieldPositionIterator();
 
     /**
      * Constructs a new, empty iterator.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     FieldPositionIterator(void);
 
     /**
      * Copy constructor.  If the copy failed for some reason, the new iterator will
      * be empty.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     FieldPositionIterator(const FieldPositionIterator&);
 
@@ -77,7 +77,7 @@ public:
      * <p>
      * Return true if this FieldPositionIterator is at the same position in an
      * equal array of run values.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     UBool operator==(const FieldPositionIterator&) const;
 
@@ -85,14 +85,14 @@ public:
      * Returns the complement of the result of operator==
      * @param rhs The FieldPositionIterator to be compared for inequality
      * @return the complement of the result of operator==
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     UBool operator!=(const FieldPositionIterator& rhs) const { return !operator==(rhs); }
 
     /**
      * If the current position is valid, updates the FieldPosition values, advances the iterator,
      * and returns TRUE, otherwise returns FALSE.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     UBool next(FieldPosition& fp);
 
@@ -108,9 +108,6 @@ private:
 
     UVector32 *data;
     int32_t pos;
-
-    // No ICU "poor man's RTTI" for this class nor its subclasses.
-    virtual UClassID getDynamicClassID() const;
 };
 
 U_NAMESPACE_END

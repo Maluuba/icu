@@ -1,13 +1,13 @@
 ﻿// ***************************************************************************
 // *
-// * Copyright (C) 2010 International Business Machines
-// * Corporation and others.  All Rights Reserved.
-// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
-// * Source File:<path>/common/main/mg.xml
+// * Copyright (C) 2014 International Business Machines
+// * Corporation and others. All Rights Reserved.
+// * Tool: org.unicode.cldr.icu.NewLdml2IcuConverter
+// * Source File: <path>/common/main/mg.xml
 // *
 // ***************************************************************************
 /**
- *  ICU <specials> source: <path>/xml/main/mg.xml
+ * ICU <specials> source: <path>/common/main/mg.xml
  */
 mg{
     AuxExemplarCharacters{"[c q u w x]"}
@@ -23,8 +23,48 @@ mg{
             }
         }
     }
-    Version{"2.0.47.63"}
+    Version{"2.0.97.28"}
     calendar{
+        generic{
+            DateTimePatterns{
+                "HH:mm:ss zzzz",
+                "HH:mm:ss z",
+                "HH:mm:ss",
+                "HH:mm",
+                "EEEE d MMMM y G",
+                "d MMMM y G",
+                "d MMM, y G",
+                "d/M/y GGGGG",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+            availableFormats{
+                M{"M"}
+                MEd{"E d/M"}
+                MMM{"MMM"}
+                MMMEd{"E d MMM"}
+                MMMMEd{"E d MMMM"}
+                MMMMd{"d MMMM"}
+                MMMd{"d MMM"}
+                MMd{"d/MM"}
+                MMdd{"dd/MM"}
+                Md{"d/M"}
+                ms{"m:ss"}
+                y{"y"}
+                yM{"M/y"}
+                yMEd{"E d/M/y"}
+                yMM{"MM/y"}
+                yMMM{"MMM y"}
+                yMMMEd{"E d MMM y"}
+                yMMMM{"MMMM y"}
+                yMMMd{"d MMM y"}
+                yQQQ{"QQQ y"}
+                yQQQQ{"QQQQ y"}
+            }
+        }
         gregorian{
             DateTimePatterns{
                 "HH:mm:ss zzzz",
@@ -34,7 +74,7 @@ mg{
                 "EEEE d MMMM y",
                 "d MMMM y",
                 "d MMM, y",
-                "d/M/yyyy",
+                "d/M/y",
                 "{1} {0}",
                 "{1} {0}",
                 "{1} {0}",
@@ -43,29 +83,26 @@ mg{
             }
             availableFormats{
                 M{"M"}
+                MEd{"E d/M"}
                 MMM{"MMM"}
                 MMMEd{"E d MMM"}
-                MMMMEd{"EEE d MMMM"}
+                MMMMEd{"E d MMMM"}
                 MMMMd{"d MMMM"}
                 MMMd{"d MMM"}
-                MMMdd{"dd MMM"}
                 MMd{"d/MM"}
                 MMdd{"dd/MM"}
                 Md{"d/M"}
-                Med{"EEE d/M"}
                 ms{"m:ss"}
                 y{"y"}
                 yM{"M/y"}
-                yMEd{"EEE d/M/y"}
+                yMEd{"E d/M/y"}
+                yMM{"MM/y"}
                 yMMM{"MMM y"}
-                yMMMEd{"EEE d MMM y"}
+                yMMMEd{"E d MMM y"}
                 yMMMM{"MMMM y"}
-                yQ{"Q y"}
+                yMMMd{"d MMM y"}
                 yQQQ{"QQQ y"}
-                yyMM{"MM/yy"}
-                yyMMM{"MMM yy"}
-                yyMMMEEEd{"EEE d MMM yy"}
-                yyMMMd{"d MMM yy"}
+                yQQQQ{"QQQQ y"}
             }
             dayNames{
                 format{
@@ -108,46 +145,6 @@ mg{
                 wide{
                     "Alohan'i JK",
                     "Aorian'i JK",
-                }
-            }
-            fields{
-                day{
-                    dn{"Andro"}
-                    relative{
-                        "-1"{"Omaly"}
-                        "0"{"Anio"}
-                        "1"{"Rahampitso"}
-                    }
-                }
-                dayperiod{
-                    dn{"AM/PM"}
-                }
-                era{
-                    dn{"Era"}
-                }
-                hour{
-                    dn{"Ora"}
-                }
-                minute{
-                    dn{"Minitra"}
-                }
-                month{
-                    dn{"Volana"}
-                }
-                second{
-                    dn{"Segondra"}
-                }
-                week{
-                    dn{"Herinandro"}
-                }
-                weekday{
-                    dn{"Andro"}
-                }
-                year{
-                    dn{"Taona"}
-                }
-                zone{
-                    dn{"Ora"}
                 }
             }
             monthNames{
@@ -221,5 +218,39 @@ mg{
         alternateQuotationStart{"“"}
         quotationEnd{"»"}
         quotationStart{"«"}
+    }
+    fields{
+        day{
+            dn{"Andro"}
+            relative{
+                "-1"{"Omaly"}
+                "0"{"Anio"}
+                "1"{"Rahampitso"}
+            }
+        }
+        dayperiod{
+            dn{"AM/PM"}
+        }
+        era{
+            dn{"Era"}
+        }
+        hour{
+            dn{"Ora"}
+        }
+        minute{
+            dn{"Minitra"}
+        }
+        month{
+            dn{"Volana"}
+        }
+        second{
+            dn{"Segondra"}
+        }
+        week{
+            dn{"Herinandro"}
+        }
+        year{
+            dn{"Taona"}
+        }
     }
 }

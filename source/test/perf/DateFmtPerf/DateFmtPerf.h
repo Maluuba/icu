@@ -1,6 +1,6 @@
 /*
 **********************************************************************
-* Copyright (c) 2002-2010,International Business Machines
+* Copyright (c) 2002-2011,International Business Machines
 * Corporation and others.  All Rights Reserved.
 **********************************************************************
 **********************************************************************
@@ -28,15 +28,16 @@
 #include "collationdata.h"
 
 #include <stdlib.h>
+#include <string.h>
+
 #include <fstream>
-#include <string>
 
 #include <iostream>
 using namespace std;
 
 //  Stubs for Windows API functions when building on UNIXes.
 //
-#if defined(U_WINDOWS)
+#if U_PLATFORM_USES_ONLY_WIN32_API
 // do nothing
 #else
 #define _UNICODE
@@ -355,28 +356,111 @@ public:
     }
 };
 
+
+
+#define NUM_STRING "9876543210.123"
+#define NUM_NUM 9876543210.123
+class StdioNumFmtFunction : public UPerfFunction
+{
+
+ private:
+  int num;
+  char locale[25];
+ public:
+	
+  StdioNumFmtFunction()
+    {
+      num = -1;
+    }
+
+  StdioNumFmtFunction(int a, const char* loc)
+    {
+      num = a;
+      strcpy(locale, loc);
+    }
+
+  virtual void call(UErrorCode* status2)
+  {
+    Locale loc(locale);
+    UErrorCode status = U_ZERO_ERROR;
+        
+    // Parse a string.  The string uses the digits '0' through '9'
+    // and the decimal separator '.', standard in the US locale
+
+    double result;
+    char outbuf[500];
+    const char *str = NUM_STRING;
+        
+    for(int i = 0; i < num; i++)
+      {
+        if(sscanf(str, "%lg", &result)!=1) {
+          cout << "Failed Stdio: failed to sscanf" << endl;
+          *status2 = U_PARSE_ERROR;
+          return;
+        }
+
+        sprintf(outbuf, "%lg", result);
+      }
+    
+    if(result!=NUM_NUM) {
+      cout << "Failed Stdio: sscanf got wrong result, expected " << NUM_NUM << " got " << result << endl;
+      *status2 = U_PARSE_ERROR;
+    }
+    if(strcmp(str,NUM_STRING)) {
+      cout << "Failed Stdio: sprintf got wrong result, expected " << NUM_STRING << " got " << str << endl;
+      *status2 = U_PARSE_ERROR;
+    }
+  }
+ 
+  virtual long getOperationsPerIteration()
+  {
+    return num;
+  }
+    
+};
+
 class CollationFunction : public UPerfFunction
 {
 
 private:
 	int num;
     char locale[25];
+	UnicodeString *collation_strings;
+
+	/**
+	 * Unescape the strings
+	 */
+	void init() {
+        uint32_t listSize = sizeof(collation_strings_escaped)/sizeof(collation_strings_escaped[0]);
+		collation_strings = new UnicodeString[listSize];
+		for(uint32_t k=0;k<listSize;k++) {
+			collation_strings[k] = collation_strings_escaped[k].unescape();
+		}
+		UnicodeString shorty((UChar32)0x12345);
+	}
 public:
 	
 	CollationFunction()
 	{
 		num = -1;
+
+		init();
+	}
+
+	~CollationFunction() {
+		delete [] collation_strings;
 	}
 
 	CollationFunction(int a, const char* loc)
 	{
 		num = a;
         strcpy(locale, loc);
+		init();
 	}
 
 	virtual void call(UErrorCode* status2)
 	{
-        uint32_t listSize = sizeof(collation_strings)/sizeof(collation_strings[0]);
+        uint32_t listSize = sizeof(collation_strings_escaped)/sizeof(collation_strings_escaped[0]);
         UErrorCode status = U_ZERO_ERROR; 
         Collator *coll = Collator::createInstance(Locale(locale), status);
         

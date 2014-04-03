@@ -1,6 +1,6 @@
 /********************************************************************
- * COPYRIGHT: 
- * Copyright (c) 1997-2010, International Business Machines
+ * COPYRIGHT:
+ * Copyright (c) 1997-2014, International Business Machines
  * Corporation and others. All Rights Reserved.
  ********************************************************************/
 
@@ -9,6 +9,7 @@
  */
 
 #include "unicode/utypes.h"
+#include "unicode/localpointer.h"
 
 #if !UCONFIG_NO_FORMATTING
 
@@ -55,6 +56,13 @@
 #include "tufmtts.h"        // TimeUnitTest
 #include "locnmtst.h"       // LocaleDisplayNamesTest
 #include "dcfmtest.h"       // DecimalFormatTest
+#include "listformattertest.h"  // ListFormatterTest
+#include "regiontst.h"      // RegionTest
+
+extern IntlTest *createCompactDecimalFormatTest();
+extern IntlTest *createGenderInfoTest();
+extern IntlTest *createRelativeDateTimeFormatterTest();
+extern IntlTest *createMeasureFormatTest();
 
 #define TESTCLASS(id, TestClass)          \
     case id:                              \
@@ -74,7 +82,7 @@ void IntlTestFormat::runIndexedTest( int32_t index, UBool exec, const char* &nam
     Locale  saveDefaultLocale = Locale::getDefault();
     if (exec) {
         saveDefaultTimeZone = TimeZone::createDefault();
-        TimeZone *tz = TimeZone::createTimeZone("PST");
+        TimeZone *tz = TimeZone::createTimeZone("America/Los_Angeles");
         TimeZone::setDefault(*tz);
         delete tz;
         UErrorCode status = U_ZERO_ERROR;
@@ -131,7 +139,44 @@ void IntlTestFormat::runIndexedTest( int32_t index, UBool exec, const char* &nam
 #if !UCONFIG_NO_REGULAR_EXPRESSIONS
         TESTCLASS(41,DecimalFormatTest);
 #endif
-
+        TESTCLASS(42,ListFormatterTest);
+        case 43:
+          name = "GenderInfoTest";
+          if (exec) {
+            logln("GenderInfoTest test---");
+            logln((UnicodeString)"");
+            LocalPointer<IntlTest> test(createGenderInfoTest());
+            callTest(*test, par);
+          }
+          break;
+        case 44:
+          name = "CompactDecimalFormatTest";
+          if (exec) {
+            logln("CompactDecimalFormatTest test---");
+            logln((UnicodeString)"");
+            LocalPointer<IntlTest> test(createCompactDecimalFormatTest());
+            callTest(*test, par);
+          }
+          break;
+        TESTCLASS(45,RegionTest);
+        case 46:
+          name = "RelativeDateTimeFormatterTest";
+          if (exec) {
+            logln("RelativeDateTimeFormatterTest test---");
+            logln((UnicodeString)"");
+            LocalPointer<IntlTest> test(createRelativeDateTimeFormatterTest());
+            callTest(*test, par);
+          }
+          break;
+        case 47:
+          name = "MeasureFormatTest";
+          if (exec) {
+            logln("MeasureFormatTest test---");
+            logln((UnicodeString)"");
+            LocalPointer<IntlTest> test(createMeasureFormatTest());
+            callTest(*test, par);
+          }
+          break;
         default: name = ""; break; //needed to end loop
     }
     if (exec) {

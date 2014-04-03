@@ -1,7 +1,7 @@
 /*
 *******************************************************************************
 *
-*   Copyright (C) 2009-2010, International Business Machines
+*   Copyright (C) 2009-2013, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 *
 *******************************************************************************
@@ -73,10 +73,86 @@ U_NAMESPACE_BEGIN
  * The set of normalization boundaries returned by these functions may not be
  * complete: There may be more boundaries that could be returned.
  * Different functions may return different boundaries.
- * @draft ICU 4.4
+ * @stable ICU 4.4
  */
 class U_COMMON_API Normalizer2 : public UObject {
 public:
+    /**
+     * Destructor.
+     * @stable ICU 4.4
+     */
+    ~Normalizer2();
+
+    /**
+     * Returns a Normalizer2 instance for Unicode NFC normalization.
+     * Same as getInstance(NULL, "nfc", UNORM2_COMPOSE, errorCode).
+     * Returns an unmodifiable singleton instance. Do not delete it.
+     * @param errorCode Standard ICU error code. Its input value must
+     *                  pass the U_SUCCESS() test, or else the function returns
+     *                  immediately. Check for U_FAILURE() on output or use with
+     *                  function chaining. (See User Guide for details.)
+     * @return the requested Normalizer2, if successful
+     * @stable ICU 49
+     */
+    static const Normalizer2 *
+    getNFCInstance(UErrorCode &errorCode);
+
+    /**
+     * Returns a Normalizer2 instance for Unicode NFD normalization.
+     * Same as getInstance(NULL, "nfc", UNORM2_DECOMPOSE, errorCode).
+     * Returns an unmodifiable singleton instance. Do not delete it.
+     * @param errorCode Standard ICU error code. Its input value must
+     *                  pass the U_SUCCESS() test, or else the function returns
+     *                  immediately. Check for U_FAILURE() on output or use with
+     *                  function chaining. (See User Guide for details.)
+     * @return the requested Normalizer2, if successful
+     * @stable ICU 49
+     */
+    static const Normalizer2 *
+    getNFDInstance(UErrorCode &errorCode);
+
+    /**
+     * Returns a Normalizer2 instance for Unicode NFKC normalization.
+     * Same as getInstance(NULL, "nfkc", UNORM2_COMPOSE, errorCode).
+     * Returns an unmodifiable singleton instance. Do not delete it.
+     * @param errorCode Standard ICU error code. Its input value must
+     *                  pass the U_SUCCESS() test, or else the function returns
+     *                  immediately. Check for U_FAILURE() on output or use with
+     *                  function chaining. (See User Guide for details.)
+     * @return the requested Normalizer2, if successful
+     * @stable ICU 49
+     */
+    static const Normalizer2 *
+    getNFKCInstance(UErrorCode &errorCode);
+
+    /**
+     * Returns a Normalizer2 instance for Unicode NFKD normalization.
+     * Same as getInstance(NULL, "nfkc", UNORM2_DECOMPOSE, errorCode).
+     * Returns an unmodifiable singleton instance. Do not delete it.
+     * @param errorCode Standard ICU error code. Its input value must
+     *                  pass the U_SUCCESS() test, or else the function returns
+     *                  immediately. Check for U_FAILURE() on output or use with
+     *                  function chaining. (See User Guide for details.)
+     * @return the requested Normalizer2, if successful
+     * @stable ICU 49
+     */
+    static const Normalizer2 *
+    getNFKDInstance(UErrorCode &errorCode);
+
+    /**
+     * Returns a Normalizer2 instance for Unicode NFKC_Casefold normalization.
+     * Same as getInstance(NULL, "nfkc_cf", UNORM2_COMPOSE, errorCode).
+     * Returns an unmodifiable singleton instance. Do not delete it.
+     * @param errorCode Standard ICU error code. Its input value must
+     *                  pass the U_SUCCESS() test, or else the function returns
+     *                  immediately. Check for U_FAILURE() on output or use with
+     *                  function chaining. (See User Guide for details.)
+     * @return the requested Normalizer2, if successful
+     * @stable ICU 49
+     */
+    static const Normalizer2 *
+    getNFKCCasefoldInstance(UErrorCode &errorCode);
+
     /**
      * Returns a Normalizer2 instance which uses the specified data file
      * (packageName/name similar to ucnv_openPackage() and ures_open()/ResourceBundle)
@@ -96,7 +172,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return the requested Normalizer2, if successful
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     static const Normalizer2 *
     getInstance(const char *packageName,
@@ -112,7 +188,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return normalized src
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     UnicodeString
     normalize(const UnicodeString &src, UErrorCode &errorCode) const {
@@ -131,7 +207,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return dest
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UnicodeString &
     normalize(const UnicodeString &src,
@@ -149,7 +225,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return first
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UnicodeString &
     normalizeSecondAndAppend(UnicodeString &first,
@@ -167,7 +243,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return first
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UnicodeString &
     append(UnicodeString &first,
@@ -175,17 +251,76 @@ public:
            UErrorCode &errorCode) const = 0;
 
     /**
-     * Gets the decomposition mapping of c. Equivalent to normalize(UnicodeString(c))
-     * on a UNORM2_DECOMPOSE Normalizer2 instance, but much faster.
+     * Gets the decomposition mapping of c.
+     * Roughly equivalent to normalizing the String form of c
+     * on a UNORM2_DECOMPOSE Normalizer2 instance, but much faster, and except that this function
+     * returns FALSE and does not write a string
+     * if c does not have a decomposition mapping in this instance's data.
      * This function is independent of the mode of the Normalizer2.
      * @param c code point
      * @param decomposition String object which will be set to c's
      *                      decomposition mapping, if there is one.
      * @return TRUE if c has a decomposition, otherwise FALSE
-     * @draft ICU 4.6
+     * @stable ICU 4.6
      */
     virtual UBool
     getDecomposition(UChar32 c, UnicodeString &decomposition) const = 0;
+
+    /**
+     * Gets the raw decomposition mapping of c.
+     *
+     * This is similar to the getDecomposition() method but returns the
+     * raw decomposition mapping as specified in UnicodeData.txt or
+     * (for custom data) in the mapping files processed by the gennorm2 tool.
+     * By contrast, getDecomposition() returns the processed,
+     * recursively-decomposed version of this mapping.
+     *
+     * When used on a standard NFKC Normalizer2 instance,
+     * getRawDecomposition() returns the Unicode Decomposition_Mapping (dm) property.
+     *
+     * When used on a standard NFC Normalizer2 instance,
+     * it returns the Decomposition_Mapping only if the Decomposition_Type (dt) is Canonical (Can);
+     * in this case, the result contains either one or two code points (=1..4 UChars).
+     *
+     * This function is independent of the mode of the Normalizer2.
+     * The default implementation returns FALSE.
+     * @param c code point
+     * @param decomposition String object which will be set to c's
+     *                      raw decomposition mapping, if there is one.
+     * @return TRUE if c has a decomposition, otherwise FALSE
+     * @stable ICU 49
+     */
+    virtual UBool
+    getRawDecomposition(UChar32 c, UnicodeString &decomposition) const;
+
+    /**
+     * Performs pairwise composition of a & b and returns the composite if there is one.
+     *
+     * Returns a composite code point c only if c has a two-way mapping to a+b.
+     * In standard Unicode normalization, this means that
+     * c has a canonical decomposition to a+b
+     * and c does not have the Full_Composition_Exclusion property.
+     *
+     * This function is independent of the mode of the Normalizer2.
+     * The default implementation returns a negative value.
+     * @param a A (normalization starter) code point.
+     * @param b Another code point.
+     * @return The non-negative composite code point if there is one; otherwise a negative value.
+     * @stable ICU 49
+     */
+    virtual UChar32
+    composePair(UChar32 a, UChar32 b) const;
+
+    /**
+     * Gets the combining class of c.
+     * The default implementation returns 0
+     * but all standard implementations return the Unicode Canonical_Combining_Class value.
+     * @param c code point
+     * @return c's combining class
+     * @stable ICU 49
+     */
+    virtual uint8_t
+    getCombiningClass(UChar32 c) const;
 
     /**
      * Tests if the string is normalized.
@@ -199,7 +334,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return TRUE if s is normalized
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UBool
     isNormalized(const UnicodeString &s, UErrorCode &errorCode) const = 0;
@@ -217,7 +352,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return UNormalizationCheckResult
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UNormalizationCheckResult
     quickCheck(const UnicodeString &s, UErrorCode &errorCode) const = 0;
@@ -242,7 +377,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return "yes" span end index
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual int32_t
     spanQuickCheckYes(const UnicodeString &s, UErrorCode &errorCode) const = 0;
@@ -258,7 +393,7 @@ public:
      * This is used for iterative normalization. See the class documentation for details.
      * @param c character to test
      * @return TRUE if c has a normalization boundary before it
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UBool hasBoundaryBefore(UChar32 c) const = 0;
 
@@ -274,7 +409,7 @@ public:
      * Note that this operation may be significantly slower than hasBoundaryBefore().
      * @param c character to test
      * @return TRUE if c has a normalization boundary after it
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UBool hasBoundaryAfter(UChar32 c) const = 0;
 
@@ -289,13 +424,9 @@ public:
      * Note that this operation may be significantly slower than hasBoundaryBefore().
      * @param c character to test
      * @return TRUE if c is normalization-inert
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UBool isInert(UChar32 c) const = 0;
-
-private:
-    // No ICU "poor man's RTTI" for this class nor its subclasses.
-    virtual UClassID getDynamicClassID() const;
 };
 
 /**
@@ -307,7 +438,7 @@ private:
  * This class implements all of (and only) the Normalizer2 API.
  * An instance of this class is unmodifiable/immutable but is constructed and
  * must be destructed by the owner.
- * @draft ICU 4.4
+ * @stable ICU 4.4
  */
 class U_COMMON_API FilteredNormalizer2 : public Normalizer2 {
 public:
@@ -319,10 +450,16 @@ public:
      * The filter set should be frozen; otherwise the performance will suffer greatly.
      * @param n2 wrapped Normalizer2 instance
      * @param filterSet UnicodeSet which determines the characters to be normalized
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     FilteredNormalizer2(const Normalizer2 &n2, const UnicodeSet &filterSet) :
             norm2(n2), set(filterSet) {}
+
+    /**
+     * Destructor.
+     * @stable ICU 4.4
+     */
+    ~FilteredNormalizer2();
 
     /**
      * Writes the normalized form of the source string to the destination string
@@ -335,7 +472,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return dest
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UnicodeString &
     normalize(const UnicodeString &src,
@@ -353,7 +490,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return first
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UnicodeString &
     normalizeSecondAndAppend(UnicodeString &first,
@@ -371,7 +508,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return first
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UnicodeString &
     append(UnicodeString &first,
@@ -379,17 +516,56 @@ public:
            UErrorCode &errorCode) const;
 
     /**
-     * Gets the decomposition mapping of c. Equivalent to normalize(UnicodeString(c))
-     * on a UNORM2_DECOMPOSE Normalizer2 instance, but much faster.
+     * Gets the decomposition mapping of c.
+     * For details see the base class documentation.
+     *
      * This function is independent of the mode of the Normalizer2.
      * @param c code point
      * @param decomposition String object which will be set to c's
      *                      decomposition mapping, if there is one.
      * @return TRUE if c has a decomposition, otherwise FALSE
-     * @draft ICU 4.6
+     * @stable ICU 4.6
      */
     virtual UBool
     getDecomposition(UChar32 c, UnicodeString &decomposition) const;
+
+    /**
+     * Gets the raw decomposition mapping of c.
+     * For details see the base class documentation.
+     *
+     * This function is independent of the mode of the Normalizer2.
+     * @param c code point
+     * @param decomposition String object which will be set to c's
+     *                      raw decomposition mapping, if there is one.
+     * @return TRUE if c has a decomposition, otherwise FALSE
+     * @stable ICU 49
+     */
+    virtual UBool
+    getRawDecomposition(UChar32 c, UnicodeString &decomposition) const;
+
+    /**
+     * Performs pairwise composition of a & b and returns the composite if there is one.
+     * For details see the base class documentation.
+     *
+     * This function is independent of the mode of the Normalizer2.
+     * @param a A (normalization starter) code point.
+     * @param b Another code point.
+     * @return The non-negative composite code point if there is one; otherwise a negative value.
+     * @stable ICU 49
+     */
+    virtual UChar32
+    composePair(UChar32 a, UChar32 b) const;
+
+    /**
+     * Gets the combining class of c.
+     * The default implementation returns 0
+     * but all standard implementations return the Unicode Canonical_Combining_Class value.
+     * @param c code point
+     * @return c's combining class
+     * @stable ICU 49
+     */
+    virtual uint8_t
+    getCombiningClass(UChar32 c) const;
 
     /**
      * Tests if the string is normalized.
@@ -400,7 +576,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return TRUE if s is normalized
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UBool
     isNormalized(const UnicodeString &s, UErrorCode &errorCode) const;
@@ -413,7 +589,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return UNormalizationCheckResult
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UNormalizationCheckResult
     quickCheck(const UnicodeString &s, UErrorCode &errorCode) const;
@@ -426,7 +602,7 @@ public:
      *                  immediately. Check for U_FAILURE() on output or use with
      *                  function chaining. (See User Guide for details.)
      * @return "yes" span end index
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual int32_t
     spanQuickCheckYes(const UnicodeString &s, UErrorCode &errorCode) const;
@@ -437,7 +613,7 @@ public:
      * For details see the Normalizer2 base class documentation.
      * @param c character to test
      * @return TRUE if c has a normalization boundary before it
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UBool hasBoundaryBefore(UChar32 c) const;
 
@@ -447,7 +623,7 @@ public:
      * For details see the Normalizer2 base class documentation.
      * @param c character to test
      * @return TRUE if c has a normalization boundary after it
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UBool hasBoundaryAfter(UChar32 c) const;
 
@@ -456,7 +632,7 @@ public:
      * For details see the Normalizer2 base class documentation.
      * @param c character to test
      * @return TRUE if c is normalization-inert
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UBool isInert(UChar32 c) const;
 private:

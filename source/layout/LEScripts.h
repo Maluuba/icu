@@ -1,11 +1,11 @@
 /*
  *
- * (C) Copyright IBM Corp. 1998-2010. All Rights Reserved.
+ * (C) Copyright IBM Corp. 1998-2013. All Rights Reserved.
  *
  * WARNING: THIS FILE IS MACHINE GENERATED. DO NOT HAND EDIT IT UNLESS
  * YOU REALLY KNOW WHAT YOU'RE DOING.
  *
- * Generated on: 02/25/2010 06:59:11 PM PST
+ * Generated on: 11/01/2011 04:08:09 PM PDT
  */
 
 #ifndef __LESCRIPTS_H
@@ -192,15 +192,61 @@ enum ScriptCodes {
     zmthScriptCode = 128,
     zsymScriptCode = 129,
 /**
- * @draft ICU 4.4
+ * @stable ICU 4.4
  */
 
     bamuScriptCode = 130,
     lisuScriptCode = 131,
     nkgbScriptCode = 132,
     sarbScriptCode = 133,
+/**
+ * @stable ICU 4.6
+ */
 
-    scriptCodeCount = 134
+    bassScriptCode = 134,
+    duplScriptCode = 135,
+    elbaScriptCode = 136,
+    granScriptCode = 137,
+    kpelScriptCode = 138,
+    lomaScriptCode = 139,
+    mendScriptCode = 140,
+    mercScriptCode = 141,
+    narbScriptCode = 142,
+    nbatScriptCode = 143,
+    palmScriptCode = 144,
+    sindScriptCode = 145,
+    waraScriptCode = 146,
+/**
+ * @stable ICU 4.8
+ */
+
+    afakScriptCode = 147,
+    jurcScriptCode = 148,
+    mrooScriptCode = 149,
+    nshuScriptCode = 150,
+    shrdScriptCode = 151,
+    soraScriptCode = 152,
+    takrScriptCode = 153,
+    tangScriptCode = 154,
+    woleScriptCode = 155,
+/**
+ * @stable ICU 49
+ */
+
+    hluwScriptCode = 156,  /* bump to match current ICU */
+    khojScriptCode = 157,
+    tirhScriptCode = 158,
+
+/**
+ * @stable ICU 52
+ */
+    aghbScriptCode = 159,
+    mahjScriptCode = 160,
+
+/**
+ * @stable ICU 2.2
+ */
+    scriptCodeCount
 };
 
 U_NAMESPACE_END

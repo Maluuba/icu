@@ -1,13 +1,13 @@
 ﻿// ***************************************************************************
 // *
-// * Copyright (C) 2010 International Business Machines
-// * Corporation and others.  All Rights Reserved.
-// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
-// * Source File:<path>/common/main/sn.xml
+// * Copyright (C) 2014 International Business Machines
+// * Corporation and others. All Rights Reserved.
+// * Tool: org.unicode.cldr.icu.NewLdml2IcuConverter
+// * Source File: <path>/common/main/sn.xml
 // *
 // ***************************************************************************
 /**
- *  ICU <specials> source: <path>/xml/main/sn.xml
+ * ICU <specials> source: <path>/common/main/sn.xml
  */
 sn{
     AuxExemplarCharacters{"[q x]"}
@@ -19,22 +19,23 @@ sn{
     NumberElements{
         latn{
             patterns{
-                currencyFormat{"¤#,##0.00;(¤#,##0.00)"}
+                accountingFormat{"¤#,##0.00;(¤#,##0.00)"}
+                currencyFormat{"¤#,##0.00"}
             }
         }
     }
-    Version{"2.0.47.63"}
+    Version{"2.0.92.87"}
     calendar{
-        gregorian{
+        generic{
             DateTimePatterns{
                 "h:mm:ss a zzzz",
                 "h:mm:ss a z",
                 "h:mm:ss a",
                 "h:mm a",
-                "EEEE, d MMMM y",
-                "d MMMM y",
-                "d MMM y",
-                "dd/MM/yyyy",
+                "EEEE, d MMMM y G",
+                "d MMMM y G",
+                "d MMM y G",
+                "dd/MM/y GGGGG",
                 "{1} {0}",
                 "{1} {0}",
                 "{1} {0}",
@@ -57,12 +58,52 @@ sn{
                 ms{"mm:ss"}
                 y{"y"}
                 yM{"M/y"}
-                yMEd{"EEE, M/d/y"}
+                yMEd{"E, M/d/y"}
                 yMMM{"MMM y"}
-                yMMMEd{"EEE, MMM d, y"}
+                yMMMEd{"E, MMM d, y"}
                 yMMMM{"MMMM y"}
-                yQ{"Q y"}
                 yQQQ{"QQQ y"}
+                yQQQQ{"QQQQ y"}
+            }
+        }
+        gregorian{
+            DateTimePatterns{
+                "h:mm:ss a zzzz",
+                "h:mm:ss a z",
+                "h:mm:ss a",
+                "h:mm a",
+                "EEEE, d MMMM y",
+                "d MMMM y",
+                "d MMM y",
+                "dd/MM/y",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+            availableFormats{
+                Hm{"HH:mm"}
+                Hms{"HH:mm:ss"}
+                M{"L"}
+                MEd{"E, M/d"}
+                MMM{"LLL"}
+                MMMEd{"E, MMM d"}
+                MMMMEd{"E, MMMM d"}
+                MMMMd{"MMMM d"}
+                MMMd{"MMM d"}
+                Md{"M/d"}
+                d{"d"}
+                hm{"h:mm a"}
+                ms{"mm:ss"}
+                y{"y"}
+                yM{"M/y"}
+                yMEd{"E, M/d/y"}
+                yMMM{"MMM y"}
+                yMMMEd{"E, MMM d, y"}
+                yMMMM{"MMMM y"}
+                yQQQ{"QQQ y"}
+                yQQQQ{"QQQQ y"}
             }
             dayNames{
                 format{
@@ -107,46 +148,6 @@ sn{
                     "Kristo ashaya",
                 }
             }
-            fields{
-                day{
-                    dn{"Zuva"}
-                    relative{
-                        "-1"{"Nezuro"}
-                        "0"{"Nhasi"}
-                        "1"{"Mangwana"}
-                    }
-                }
-                dayperiod{
-                    dn{"Zuva"}
-                }
-                era{
-                    dn{"Mukore"}
-                }
-                hour{
-                    dn{"Awa"}
-                }
-                minute{
-                    dn{"Mineti"}
-                }
-                month{
-                    dn{"Mwedzi"}
-                }
-                second{
-                    dn{"Sekondi"}
-                }
-                week{
-                    dn{"Vhiki"}
-                }
-                weekday{
-                    dn{"Zuva revhiki"}
-                }
-                year{
-                    dn{"Gore"}
-                }
-                zone{
-                    dn{"Nguva"}
-                }
-            }
             monthNames{
                 format{
                     abbreviated{
@@ -154,9 +155,9 @@ sn{
                         "Kuk",
                         "Kur",
                         "Kub",
-                        "Chi",
-                        "Chi",
-                        "Chi",
+                        "Chv",
+                        "Chk",
+                        "Chg",
                         "Nya",
                         "Gun",
                         "Gum",
@@ -214,9 +215,46 @@ sn{
         }
     }
     delimiters{
-        alternateQuotationEnd{"”"}
-        alternateQuotationStart{"”"}
-        quotationEnd{"'"}
-        quotationStart{"'"}
+        alternateQuotationEnd{"’"}
+        alternateQuotationStart{"’"}
+        quotationEnd{"”"}
+        quotationStart{"”"}
+    }
+    fields{
+        day{
+            dn{"Zuva"}
+            relative{
+                "-1"{"Nezuro"}
+                "0"{"Nhasi"}
+                "1"{"Mangwana"}
+            }
+        }
+        era{
+            dn{"Mukore"}
+        }
+        hour{
+            dn{"Awa"}
+        }
+        minute{
+            dn{"Mineti"}
+        }
+        month{
+            dn{"Mwedzi"}
+        }
+        second{
+            dn{"Sekondi"}
+        }
+        week{
+            dn{"Vhiki"}
+        }
+        weekday{
+            dn{"Zuva revhiki"}
+        }
+        year{
+            dn{"Gore"}
+        }
+        zone{
+            dn{"Nguva"}
+        }
     }
 }

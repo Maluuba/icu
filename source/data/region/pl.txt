@@ -1,17 +1,17 @@
 ﻿// ***************************************************************************
 // *
-// * Copyright (C) 2010 International Business Machines
-// * Corporation and others.  All Rights Reserved.
-// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
-// * Source File:<path>/common/main/pl.xml
+// * Copyright (C) 2014 International Business Machines
+// * Corporation and others. All Rights Reserved.
+// * Tool: org.unicode.cldr.icu.NewLdml2IcuConverter
+// * Source File: <path>/common/main/pl.xml
 // *
 // ***************************************************************************
 /**
- *  ICU <specials> source: <path>/xml/main/pl.xml
+ * ICU <specials> source: <path>/common/main/pl.xml
  */
 pl{
     Countries{
-        001{"Świat"}
+        001{"świat"}
         002{"Afryka"}
         003{"Ameryka Północna"}
         005{"Ameryka Południowa"}
@@ -23,17 +23,16 @@ pl{
         017{"Afryka Środkowa"}
         018{"Afryka Południowa"}
         019{"Ameryka"}
-        021{"Ameryka Północna - Kanada, USA"}
+        021{"Ameryka Północna (USA, Kanada)"}
         029{"Karaiby"}
         030{"Azja Wschodnia"}
         034{"Azja Południowa"}
         035{"Azja Południowo-Wschodnia"}
         039{"Europa Południowa"}
-        053{"Australia i Nowa Zelandia"}
+        053{"Australazja"}
         054{"Melanezja"}
-        057{"Mikronezja"}
+        057{"Region Mikronezji"}
         061{"Polinezja"}
-        062{"Azja Południowo-Środkowa"}
         142{"Azja"}
         143{"Azja Środkowa"}
         145{"Azja Zachodnia"}
@@ -41,9 +40,7 @@ pl{
         151{"Europa Wschodnia"}
         154{"Europa Północna"}
         155{"Europa Zachodnia"}
-        172{"Wspólnota Niezależnych Państw"}
-        419{"Ameryka Łacińska i Karaiby"}
-        830{"Wyspy Normandzkie"}
+        419{"Ameryka Łacińska"}
         AC{"Wyspa Wniebowstąpienia"}
         AD{"Andora"}
         AE{"Zjednoczone Emiraty Arabskie"}
@@ -71,10 +68,11 @@ pl{
         BH{"Bahrajn"}
         BI{"Burundi"}
         BJ{"Benin"}
-        BL{"Saint Barthélemy"}
+        BL{"Saint-Barthélemy"}
         BM{"Bermudy"}
         BN{"Brunei Darussalam"}
         BO{"Boliwia"}
+        BQ{"Niderlandy Karaibskie"}
         BR{"Brazylia"}
         BS{"Bahamy"}
         BT{"Bhutan"}
@@ -88,7 +86,7 @@ pl{
         CF{"Republika Środkowoafrykańska"}
         CG{"Kongo"}
         CH{"Szwajcaria"}
-        CI{"Wybrzeże Kości Słoniowej"}
+        CI{"Côte d’Ivoire"}
         CK{"Wyspy Cooka"}
         CL{"Chile"}
         CM{"Kamerun"}
@@ -96,9 +94,9 @@ pl{
         CO{"Kolumbia"}
         CP{"Clipperton"}
         CR{"Kostaryka"}
-        CS{"Serbia i Czarnogóra"}
         CU{"Kuba"}
         CV{"Republika Zielonego Przylądka"}
+        CW{"Curaçao"}
         CX{"Wyspa Bożego Narodzenia"}
         CY{"Cypr"}
         CZ{"Czechy"}
@@ -107,7 +105,7 @@ pl{
         DJ{"Dżibuti"}
         DK{"Dania"}
         DM{"Dominika"}
-        DO{"Republika Dominikańska"}
+        DO{"Dominikana"}
         DZ{"Algieria"}
         EA{"Ceuta i Melilla"}
         EC{"Ekwador"}
@@ -121,7 +119,7 @@ pl{
         FI{"Finlandia"}
         FJ{"Fidżi"}
         FK{"Falklandy"}
-        FM{"Federalne Stany Mikronezji"}
+        FM{"Mikronezja"}
         FO{"Wyspy Owcze"}
         FR{"Francja"}
         GA{"Gabon"}
@@ -155,7 +153,7 @@ pl{
         IL{"Izrael"}
         IM{"Wyspa Man"}
         IN{"Indie"}
-        IO{"Terytorium Brytyjskie Oceanu Indyjskiego"}
+        IO{"Brytyjskie Terytorium Oceanu Indyjskiego"}
         IQ{"Irak"}
         IR{"Iran"}
         IS{"Islandia"}
@@ -190,12 +188,12 @@ pl{
         MC{"Monako"}
         MD{"Mołdawia"}
         ME{"Czarnogóra"}
-        MF{"Sint Maarten"}
+        MF{"Saint-Martin"}
         MG{"Madagaskar"}
         MH{"Wyspy Marshalla"}
         MK{"Macedonia"}
         ML{"Mali"}
-        MM{"Birma"}
+        MM{"Mjanma (Birma)"}
         MN{"Mongolia"}
         MO{"Makau SAR"}
         MP{"Mariany Północne"}
@@ -225,7 +223,7 @@ pl{
         PA{"Panama"}
         PE{"Peru"}
         PF{"Polinezja Francuska"}
-        PG{"Papua Nowa Gwinea"}
+        PG{"Papua-Nowa Gwinea"}
         PH{"Filipiny"}
         PK{"Pakistan"}
         PL{"Polska"}
@@ -258,8 +256,10 @@ pl{
         SN{"Senegal"}
         SO{"Somalia"}
         SR{"Surinam"}
+        SS{"Sudan Południowy"}
         ST{"Wyspy Świętego Tomasza i Książęca"}
         SV{"Salwador"}
+        SX{"Sint Maarten"}
         SY{"Syria"}
         SZ{"Suazi"}
         TA{"Tristan da Cunha"}
@@ -294,12 +294,20 @@ pl{
         VU{"Vanuatu"}
         WF{"Wallis i Futuna"}
         WS{"Samoa"}
+        XK{"Kosowo"}
         YE{"Jemen"}
         YT{"Majotta"}
         ZA{"Republika Południowej Afryki"}
         ZM{"Zambia"}
         ZW{"Zimbabwe"}
-        ZZ{"Nieznany lub nieprawidłowy region"}
+        ZZ{"Nieznany region"}
     }
-    Version{"2.0.49.97"}
+    CountriesShort{
+        GB{"GB"}
+        HK{"Hongkong"}
+        MO{"Makau"}
+        PS{"Palestyna"}
+        US{"USA"}
+    }
+    Version{"2.0.98.52"}
 }

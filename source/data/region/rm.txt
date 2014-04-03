@@ -1,13 +1,13 @@
 ﻿// ***************************************************************************
 // *
-// * Copyright (C) 2010 International Business Machines
-// * Corporation and others.  All Rights Reserved.
-// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
-// * Source File:<path>/common/main/rm.xml
+// * Copyright (C) 2014 International Business Machines
+// * Corporation and others. All Rights Reserved.
+// * Tool: org.unicode.cldr.icu.NewLdml2IcuConverter
+// * Source File: <path>/common/main/rm.xml
 // *
 // ***************************************************************************
 /**
- *  ICU <specials> source: <path>/xml/main/rm.xml
+ * ICU <specials> source: <path>/common/main/rm.xml
  */
 rm{
     Countries{
@@ -32,7 +32,6 @@ rm{
         054{"Melanesia"}
         057{"Regiun Micronesica"}
         061{"Polinesia"}
-        062{"Asia Centrala dal Sid"}
         142{"Asia"}
         143{"Asia Centrala"}
         145{"Asia dal Vest"}
@@ -40,10 +39,7 @@ rm{
         151{"Europa Orientala"}
         154{"Europa dal Nord"}
         155{"Europa dal Vest"}
-        172{"Communitad dals Stadis Independents"}
-        200{"Tschecoslovachia"}
-        419{"America Latina e Caribica"}
-        830{"Inslas dal Chanal da la Mongia"}
+        419{"America Latina"}
         AD{"Andorra"}
         AE{"Emirats Arabs Unids"}
         AF{"Afghanistan"}
@@ -94,7 +90,6 @@ rm{
         CN{"China"}
         CO{"Columbia"}
         CR{"Costa Rica"}
-        CS{"Serbia e Montenegro"}
         CU{"Cuba"}
         CV{"Cap Verd"}
         CX{"Insla da Christmas"}
@@ -295,5 +290,5 @@ rm{
         ZW{"Simbabwe"}
         ZZ{"Regiun betg encouschenta u nunvalaivla"}
     }
-    Version{"2.0.47.63"}
+    Version{"2.0.98.52"}
 }

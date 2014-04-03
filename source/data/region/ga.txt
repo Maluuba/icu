@@ -1,13 +1,13 @@
 ﻿// ***************************************************************************
 // *
-// * Copyright (C) 2010 International Business Machines
-// * Corporation and others.  All Rights Reserved.
-// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
-// * Source File:<path>/common/main/ga.xml
+// * Copyright (C) 2014 International Business Machines
+// * Corporation and others. All Rights Reserved.
+// * Tool: org.unicode.cldr.icu.NewLdml2IcuConverter
+// * Source File: <path>/common/main/ga.xml
 // *
 // ***************************************************************************
 /**
- *  ICU <specials> source: <path>/xml/main/ga.xml
+ * ICU <specials> source: <path>/common/main/ga.xml
  */
 ga{
     Countries{
@@ -24,7 +24,6 @@ ga{
         142{"An Áise"}
         143{"An Áise Láir"}
         150{"An Eoraip"}
-        172{"Comhlathas na Stát Neamhspleácha"}
         419{"Meiriceá Laidineach agus an Mhuir Chairib"}
         AD{"Andóra"}
         AE{"Aontas na nÉimíríochtaí Arabacha"}
@@ -75,7 +74,6 @@ ga{
         CN{"An tSín"}
         CO{"An Cholóim"}
         CR{"Cósta Ríce"}
-        CS{"An tSeirbia agus Montainéagró"}
         CU{"Cúba"}
         CV{"An Rinn Ghlas"}
         CX{"Oileán na Nollag"}
@@ -275,5 +273,9 @@ ga{
         ZW{"An tSiombáib"}
         ZZ{"Réigiún Anaithnid nó Neamhbhailí"}
     }
-    Version{"2.0.47.67"}
+    CountriesShort{
+        HK{"Hong Cong"}
+        MO{"Macáó"}
+    }
+    Version{"2.0.97.91"}
 }

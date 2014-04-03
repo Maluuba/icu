@@ -1,6 +1,6 @@
 /***********************************************************************
  * COPYRIGHT: 
- * Copyright (c) 1997-2010, International Business Machines Corporation
+ * Copyright (c) 1997-2011, International Business Machines Corporation
  * and others. All Rights Reserved.
  ***********************************************************************/
 
@@ -218,16 +218,7 @@ if (fr != NULL && it != NULL && de != NULL)
         name = locales[i].getName();
         logln(name);
     }
-    
-    // check default value of lenient, and setting/testing
-    if ( !fr->isLenient() ) {
-        errln("ERROR: isLenient() not TRUE by default for DateFormat");
-    } else {
-        fr->setLenient(FALSE);
-        if ( fr->isLenient() ) {
-            errln("ERROR: isLenient() after setLenient(FALSE) failed");
-        }
-    }
+
     fr->setLenient(it->isLenient());
     if(fr->isLenient() != it->isLenient()) {
         errln("ERROR: setLenient() failed");
@@ -315,15 +306,19 @@ IntlTestDateFormatAPI::TestNameHiding(void) {
         logln("SimpleDateFormat");
         status = U_ZERO_ERROR;
         SimpleDateFormat sdf(status);
-        // Format API
-        sdf.format(dateObj, str, status);
-        sdf.format(dateObj, str, fpos, status);
-        // DateFormat API
-        sdf.format((UDate)0, str, fpos);
-        sdf.format((UDate)0, str);
-        sdf.parse(str, status);
-        sdf.parse(str, ppos);
-        sdf.getNumberFormat();
+        if (U_SUCCESS(status)) {
+            // Format API
+            sdf.format(dateObj, str, status);
+            sdf.format(dateObj, str, fpos, status);
+            // DateFormat API
+            sdf.format((UDate)0, str, fpos);
+            sdf.format((UDate)0, str);
+            sdf.parse(str, status);
+            sdf.parse(str, ppos);
+            sdf.getNumberFormat();
+        } else {
+            dataerrln("FAIL: Can't create SimpleDateFormat() - %s", u_errorName(status));
+        }
     }
 
     // NumberFormat calling Format API

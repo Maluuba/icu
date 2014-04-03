@@ -1,7 +1,7 @@
 /*
 *******************************************************************************
 *
-*   Copyright (C) 2003-2010, International Business Machines
+*   Copyright (C) 2003-2011, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 *
 *******************************************************************************
@@ -119,8 +119,6 @@ private:
     uint8_t *swapped;
     int32_t length;
 };
-
-U_NAMESPACE_END
 
 // check a dependency ------------------------------------------------------ ***
 
@@ -392,7 +390,7 @@ ures_enumDependencies(const char *itemName, const UDataInfo *pInfo,
         }
     }
 
-    U_NAMESPACE_QUALIFIER NativeItem nativePool;
+    icu::NativeItem nativePool;
 
     if(resData.usesPoolBundle) {
         char poolName[200];
@@ -573,8 +571,6 @@ getDataFormat(const uint8_t dataFormat[4]) {
 }
 
 // enumerate dependencies of a package item -------------------------------- ***
-
-U_NAMESPACE_BEGIN
 
 void
 Package::enumDependencies(Item *pItem, void *context, CheckDependency check) {

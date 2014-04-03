@@ -1,6 +1,6 @@
 /********************************************************************
  * COPYRIGHT: 
- * Copyright (c) 1997-2010, International Business Machines Corporation and
+ * Copyright (c) 1997-2012, International Business Machines Corporation and
  * others. All Rights Reserved.
  ********************************************************************/
 /*   file name:  strtest.cpp
@@ -91,173 +91,84 @@ void StringTest::TestCharsetFamily(void) {
 
 U_STRING_DECL(ustringVar, "aZ0 -", 5);
 
+void
+StringTest::Test_U_STRING() {
+    U_STRING_INIT(ustringVar, "aZ0 -", 5);
+    if( u_strlen(ustringVar)!=5 ||
+        ustringVar[0]!=0x61 ||
+        ustringVar[1]!=0x5a ||
+        ustringVar[2]!=0x30 ||
+        ustringVar[3]!=0x20 ||
+        ustringVar[4]!=0x2d ||
+        ustringVar[5]!=0
+    ) {
+        errln("Test_U_STRING: U_STRING_DECL with U_STRING_INIT does not work right! "
+              "See putil.h and utypes.h with platform.h.");
+    }
+}
+
+void
+StringTest::Test_UNICODE_STRING() {
+    UnicodeString ustringVar=UNICODE_STRING("aZ0 -", 5);
+    if( ustringVar.length()!=5 ||
+        ustringVar[0]!=0x61 ||
+        ustringVar[1]!=0x5a ||
+        ustringVar[2]!=0x30 ||
+        ustringVar[3]!=0x20 ||
+        ustringVar[4]!=0x2d
+    ) {
+        errln("Test_UNICODE_STRING: UNICODE_STRING does not work right! "
+              "See unistr.h and utypes.h with platform.h.");
+    }
+}
+
+void
+StringTest::Test_UNICODE_STRING_SIMPLE() {
+    UnicodeString ustringVar=UNICODE_STRING_SIMPLE("aZ0 -");
+    if( ustringVar.length()!=5 ||
+        ustringVar[0]!=0x61 ||
+        ustringVar[1]!=0x5a ||
+        ustringVar[2]!=0x30 ||
+        ustringVar[3]!=0x20 ||
+        ustringVar[4]!=0x2d
+    ) {
+        errln("Test_UNICODE_STRING_SIMPLE: UNICODE_STRING_SIMPLE does not work right! "
+              "See unistr.h and utypes.h with platform.h.");
+    }
+}
+
+void
+StringTest::Test_UTF8_COUNT_TRAIL_BYTES() {
+    if(UTF8_COUNT_TRAIL_BYTES(0x7F) != 0
+        || UTF8_COUNT_TRAIL_BYTES(0xC0) != 1
+        || UTF8_COUNT_TRAIL_BYTES(0xE0) != 2
+        || UTF8_COUNT_TRAIL_BYTES(0xF0) != 3)
+    {
+        errln("Test_UTF8_COUNT_TRAIL_BYTES: UTF8_COUNT_TRAIL_BYTES does not work right! "
+              "See utf8.h.");
+    }
+}
+
 void StringTest::runIndexedTest(int32_t index, UBool exec, const char *&name, char * /*par*/) {
     if(exec) {
         logln("TestSuite Character and String Test: ");
     }
-    switch(index) {
-    case 0:
-        name="TestEndian";
-        if(exec) {
-            TestEndian();
-        }
-        break;
-    case 1:
-        name="TestSizeofTypes";
-        if(exec) {
-            TestSizeofTypes();
-        }
-        break;
-    case 2:
-        name="TestCharsetFamily";
-        if(exec) {
-            TestCharsetFamily();
-        }
-        break;
-    case 3:
-        name="Test_U_STRING";
-        if(exec) {
-            U_STRING_INIT(ustringVar, "aZ0 -", 5);
-            if( sizeof(ustringVar)/sizeof(*ustringVar)!=6 ||
-                ustringVar[0]!=0x61 ||
-                ustringVar[1]!=0x5a ||
-                ustringVar[2]!=0x30 ||
-                ustringVar[3]!=0x20 ||
-                ustringVar[4]!=0x2d ||
-                ustringVar[5]!=0
-            ) {
-                errln("Test_U_STRING: U_STRING_DECL with U_STRING_INIT does not work right! "
-                      "See putil.h and utypes.h with platform.h.");
-            }
-        }
-        break;
-    case 4:
-        name="Test_UNICODE_STRING";
-        if(exec) {
-            UnicodeString ustringVar=UNICODE_STRING("aZ0 -", 5);
-            if( ustringVar.length()!=5 ||
-                ustringVar[0]!=0x61 ||
-                ustringVar[1]!=0x5a ||
-                ustringVar[2]!=0x30 ||
-                ustringVar[3]!=0x20 ||
-                ustringVar[4]!=0x2d
-            ) {
-                errln("Test_UNICODE_STRING: UNICODE_STRING does not work right! "
-                      "See unistr.h and utypes.h with platform.h.");
-            }
-        }
-        break;
-    case 5:
-        name="Test_UNICODE_STRING_SIMPLE";
-        if(exec) {
-            UnicodeString ustringVar=UNICODE_STRING_SIMPLE("aZ0 -");
-            if( ustringVar.length()!=5 ||
-                ustringVar[0]!=0x61 ||
-                ustringVar[1]!=0x5a ||
-                ustringVar[2]!=0x30 ||
-                ustringVar[3]!=0x20 ||
-                ustringVar[4]!=0x2d
-            ) {
-                errln("Test_UNICODE_STRING_SIMPLE: UNICODE_STRING_SIMPLE does not work right! "
-                      "See unistr.h and utypes.h with platform.h.");
-            }
-        }
-        break;
-    case 6:
-        name="Test_UTF8_COUNT_TRAIL_BYTES";
-        if(exec) {
-            if(UTF8_COUNT_TRAIL_BYTES(0x7F) != 0
-                || UTF8_COUNT_TRAIL_BYTES(0xC0) != 1
-                || UTF8_COUNT_TRAIL_BYTES(0xE0) != 2
-                || UTF8_COUNT_TRAIL_BYTES(0xF0) != 3)
-            {
-                errln("Test_UTF8_COUNT_TRAIL_BYTES: UTF8_COUNT_TRAIL_BYTES does not work right! "
-                      "See utf8.h.");
-            }
-        }
-        break;
-    case 7:
-        name="TestSTLCompatibility";
-        if(exec) {
-            TestSTLCompatibility();
-        }
-        break;
-    case 8:
-        name="TestStdNamespaceQualifier";
-        if(exec) {
-            TestStdNamespaceQualifier();
-        }
-        break;
-    case 9:
-        name="TestUsingStdNamespace";
-        if(exec) {
-            TestUsingStdNamespace();
-        }
-        break;
-    case 10:
-        name="TestStringPiece";
-        if(exec) {
-            TestStringPiece();
-        }
-        break;
-    case 11:
-        name="TestByteSink";
-        if(exec) {
-            TestByteSink();
-        }
-        break;
-    case 12:
-        name="TestCheckedArrayByteSink";
-        if(exec) {
-            TestCheckedArrayByteSink();
-        }
-        break;
-    case 13:
-        name="TestStringByteSink";
-        if(exec) {
-            TestStringByteSink();
-        }
-        break;
-    case 14:
-        name="TestCharString";
-        if(exec) {
-            TestCharString();
-        }
-        break;
-    default:
-        name="";
-        break;
-    }
-}
-
-// Syntax check for the correct namespace qualifier for the standard string class.
-void
-StringTest::TestStdNamespaceQualifier() {
-#if U_HAVE_STD_STRING
-    U_STD_NSQ string s="abc xyz";
-    U_STD_NSQ string t="abc";
-    t.append(" ");
-    t.append("xyz");
-    if(s!=t) {
-        errln("standard string concatenation error: %s != %s", s.c_str(), t.c_str());
-    }
-#endif
-}
-
-void
-StringTest::TestUsingStdNamespace() {
-#if U_HAVE_STD_STRING
-    // Now test that "using namespace std;" is defined correctly.
-    U_STD_NS_USE
-
-    string s="abc xyz";
-    string t="abc";
-    t.append(" ");
-    t.append("xyz");
-    if(s!=t) {
-        errln("standard string concatenation error: %s != %s", s.c_str(), t.c_str());
-    }
-#endif
+    TESTCASE_AUTO_BEGIN;
+    TESTCASE_AUTO(TestEndian);
+    TESTCASE_AUTO(TestSizeofTypes);
+    TESTCASE_AUTO(TestCharsetFamily);
+    TESTCASE_AUTO(Test_U_STRING);
+    TESTCASE_AUTO(Test_UNICODE_STRING);
+    TESTCASE_AUTO(Test_UNICODE_STRING_SIMPLE);
+    TESTCASE_AUTO(Test_UTF8_COUNT_TRAIL_BYTES);
+    TESTCASE_AUTO(TestSTLCompatibility);
+    TESTCASE_AUTO(TestStringPiece);
+    TESTCASE_AUTO(TestStringPieceComparisons);
+    TESTCASE_AUTO(TestByteSink);
+    TESTCASE_AUTO(TestCheckedArrayByteSink);
+    TESTCASE_AUTO(TestStringByteSink);
+    TESTCASE_AUTO(TestCharString);
+    TESTCASE_AUTO_END;
 }
 
 void
@@ -286,7 +197,7 @@ StringTest::TestStringPiece() {
     }
 #if U_HAVE_STD_STRING
     // Construct from std::string.
-    U_STD_NSQ string uvwxyz_string("uvwxyz");
+    std::string uvwxyz_string("uvwxyz");
     StringPiece uvwxyz(uvwxyz_string);
     if(uvwxyz.empty() || uvwxyz.data()!=uvwxyz_string.data() || uvwxyz.length()!=6 || uvwxyz.size()!=6) {
         errln("StringPiece(uvwxyz_string) failed");
@@ -394,6 +305,31 @@ StringTest::TestStringPiece() {
     sp.remove_suffix(5);
     if(!sp.empty() || sp.length()!=0 || sp.size()!=0) {
         errln("abcd.remove_suffix(5) failed");
+    }
+}
+
+void
+StringTest::TestStringPieceComparisons() {
+    StringPiece empty;
+    StringPiece null(NULL);
+    StringPiece abc("abc");
+    StringPiece abcd("abcdefg", 4);
+    StringPiece abx("abx");
+    if(empty!=null) {
+        errln("empty!=null");
+    }
+    if(empty==abc) {
+        errln("empty==abc");
+    }
+    if(abc==abcd) {
+        errln("abc==abcd");
+    }
+    abcd.remove_suffix(1);
+    if(abc!=abcd) {
+        errln("abc!=abcd.remove_suffix(1)");
+    }
+    if(abc==abx) {
+        errln("abc==abx");
     }
 }
 
@@ -513,8 +449,8 @@ StringTest::TestStringByteSink() {
 #if U_HAVE_STD_STRING
     // Not much to test because only the constructor and Append()
     // are implemented, and trivially so.
-    U_STD_NSQ string result("abc");  // std::string
-    StringByteSink<U_STD_NSQ string> sink(&result);
+    std::string result("abc");  // std::string
+    StringByteSink<std::string> sink(&result);
     sink.Append("def", 3);
     if(result != "abcdef") {
         errln("StringByteSink did not Append() as expected");
@@ -522,13 +458,13 @@ StringTest::TestStringByteSink() {
 #endif
 }
 
-#if defined(U_WINDOWS) && defined(_MSC_VER)
+#if defined(_MSC_VER)
 #include <vector>
 #endif
 
 void
 StringTest::TestSTLCompatibility() {
-#if defined(U_WINDOWS) && defined(_MSC_VER)
+#if defined(_MSC_VER)
     /* Just make sure that it compiles with STL's placement new usage. */
     std::vector<UnicodeString> myvect;
     myvect.push_back(UnicodeString("blah"));
@@ -544,6 +480,12 @@ StringTest::TestCharString() {
     CharString chStr(longStr, errorCode);
     if (0 != strcmp(longStr, chStr.data()) || (int32_t)strlen(longStr) != chStr.length()) {
         errln("CharString(longStr) failed.");
+    }
+    CharString test("Test", errorCode);
+    CharString copy(test,errorCode);
+    copy.copyFrom(chStr, errorCode);
+    if (0 != strcmp(longStr, copy.data()) || (int32_t)strlen(longStr) != copy.length()) {
+        errln("CharString.copyFrom() failed.");
     }
     StringPiece sp(chStr.toStringPiece());
     sp.remove_prefix(4);

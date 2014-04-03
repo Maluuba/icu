@@ -1,13 +1,13 @@
 ﻿// ***************************************************************************
 // *
-// * Copyright (C) 2010 International Business Machines
-// * Corporation and others.  All Rights Reserved.
-// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
-// * Source File:<path>/common/main/eo.xml
+// * Copyright (C) 2014 International Business Machines
+// * Corporation and others. All Rights Reserved.
+// * Tool: org.unicode.cldr.icu.NewLdml2IcuConverter
+// * Source File: <path>/common/main/eo.xml
 // *
 // ***************************************************************************
 /**
- *  ICU <specials> source: <path>/xml/main/eo.xml
+ * ICU <specials> source: <path>/common/main/eo.xml
  */
 eo{
     Languages{
@@ -22,7 +22,6 @@ eo{
         ba{"baŝkira"}
         be{"belorusa"}
         bg{"bulgara"}
-        bh{"bihara"}
         bi{"bislamo"}
         bn{"bengala"}
         bo{"tibeta"}
@@ -34,7 +33,9 @@ eo{
         cy{"kimra"}
         da{"dana"}
         de{"germana"}
+        dv{"mahla"}
         dz{"dzonko"}
+        efi{"ibibioefika"}
         el{"greka"}
         en{"angla"}
         eo{"esperanto"}
@@ -54,9 +55,11 @@ eo{
         gn{"gvarania"}
         gu{"guĝarata"}
         ha{"haŭsa"}
+        haw{"havaja"}
         he{"hebrea"}
         hi{"hinda"}
         hr{"kroata"}
+        ht{"haitia kreola"}
         hu{"hungara"}
         hy{"armena"}
         ia{"interlingvao"}
@@ -78,6 +81,7 @@ eo{
         ku{"kurda"}
         ky{"kirgiza"}
         la{"latino"}
+        lb{"luksemburga"}
         ln{"lingala"}
         lo{"laŭa"}
         lt{"litova"}
@@ -92,6 +96,7 @@ eo{
         mt{"malta"}
         my{"birma"}
         na{"naura"}
+        nb{"dannorvega"}
         ne{"nepala"}
         nl{"nederlanda"}
         nn{"novnorvega"}
@@ -101,10 +106,10 @@ eo{
         or{"orijo"}
         pa{"panĝaba"}
         pl{"pola"}
-        ps{"paŝtua"}
+        ps{"paŝtoa"}
         pt{"portugala"}
         pt_BR{"brazilportugala"}
-        pt_PT{"portugalportugala"}
+        pt_PT{"eŭropportugala"}
         qu{"keĉua"}
         rm{"romanĉa"}
         rn{"burunda"}
@@ -144,6 +149,7 @@ eo{
         tw{"akana"}
         ug{"ujgura"}
         uk{"ukraina"}
+        und{"nekonata lingvo"}
         ur{"urduo"}
         uz{"uzbeka"}
         vi{"vjetnama"}
@@ -154,7 +160,10 @@ eo{
         yo{"joruba"}
         za{"ĝuanga"}
         zh{"ĉina"}
+        zh_Hans{"ĉina simpligita"}
+        zh_Hant{"ĉina tradicia"}
         zu{"zulua"}
+        zxx{"nelingvaĵo"}
     }
-    Version{"2.0.47.67"}
+    Version{"2.0.97.91"}
 }

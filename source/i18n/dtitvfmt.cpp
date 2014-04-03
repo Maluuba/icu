@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2008-2010, International Business Machines Corporation and
+* Copyright (C) 2008-2014, International Business Machines Corporation and
 * others. All Rights Reserved.
 *******************************************************************************
 *
@@ -8,7 +8,7 @@
 *******************************************************************************
 */
 
-#include <typeinfo>  // for 'typeid' to work
+#include "utypeinfo.h"  // for 'typeid' to work
 
 #include "unicode/dtitvfmt.h"
 
@@ -416,6 +416,50 @@ DateIntervalFormat::getDateFormat() const {
 }
 
 
+void
+DateIntervalFormat::adoptTimeZone(TimeZone* zone)
+{
+    if (fDateFormat != NULL) {
+        fDateFormat->adoptTimeZone(zone);
+    }
+    // The fDateFormat has the master calendar for the DateIntervalFormat and has
+    // ownership of any adopted TimeZone; fFromCalendar and fToCalendar are internal
+    // work clones of that calendar (and should not also be given ownership of the
+    // adopted TimeZone).
+    if (fFromCalendar) {
+    	fFromCalendar->setTimeZone(*zone);
+    }
+    if (fToCalendar) {
+    	fToCalendar->setTimeZone(*zone);
+    }
+}
+
+void
+DateIntervalFormat::setTimeZone(const TimeZone& zone)
+{
+    if (fDateFormat != NULL) {
+        fDateFormat->setTimeZone(zone);
+    }
+    // The fDateFormat has the master calendar for the DateIntervalFormat;
+    // fFromCalendar and fToCalendar are internal work clones of that calendar.
+    if (fFromCalendar) {
+    	fFromCalendar->setTimeZone(zone);
+    }
+    if (fToCalendar) {
+    	fToCalendar->setTimeZone(zone);
+    }
+}
+
+const TimeZone&
+DateIntervalFormat::getTimeZone() const
+{
+    if (fDateFormat != NULL) {
+        return fDateFormat->getTimeZone();
+    }
+    // If fDateFormat is NULL (unexpected), create default timezone.
+    return *(TimeZone::createDefault());
+}
+
 DateIntervalFormat::DateIntervalFormat(const Locale& locale,
                                        DateIntervalInfo* dtItvInfo,
                                        const UnicodeString* skeleton,
@@ -613,7 +657,7 @@ DateIntervalFormat::initializePattern(UErrorCode& status) {
         if ( timeSkeleton.length() != 0 ) {
             if ( dateSkeleton.length() == 0 ) {
                 // prefix with yMd
-                timeSkeleton.insert(0, gDateFormatSkeleton[DateFormat::kShort]);
+                timeSkeleton.insert(0, gDateFormatSkeleton[DateFormat::kShort], -1);
                 UnicodeString pattern = fDtpng->getBestPattern(timeSkeleton, status);
                 if ( U_FAILURE(status) ) {
                     return;    
@@ -638,7 +682,7 @@ DateIntervalFormat::initializePattern(UErrorCode& status) {
         // done
     } else if ( dateSkeleton.length() == 0 ) {
         // prefix with yMd
-        timeSkeleton.insert(0, gDateFormatSkeleton[DateFormat::kShort]);
+        timeSkeleton.insert(0, gDateFormatSkeleton[DateFormat::kShort], -1);
         UnicodeString pattern = fDtpng->getBestPattern(timeSkeleton, status);
         if ( U_FAILURE(status) ) {
             return;    
@@ -776,6 +820,8 @@ DateIntervalFormat::getDateTimeSkeleton(const UnicodeString& skeleton,
           case LOW_G:
           case LOW_E:
           case LOW_C:
+          case CAP_U:
+          case LOW_R:
             normalizedDateSkeleton.append(ch);
             dateSkeleton.append(ch);
             break;
@@ -819,7 +865,9 @@ DateIntervalFormat::getDateTimeSkeleton(const UnicodeString& skeleton,
 
     /* generate normalized form for date*/
     if ( yCount != 0 ) {
-        normalizedDateSkeleton.append(LOW_Y);
+        for (i = 0; i < yCount; ++i) {
+            normalizedDateSkeleton.append(LOW_Y);
+        }
     }
     if ( MCount != 0 ) {
         if ( MCount < 3 ) {
@@ -1305,7 +1353,8 @@ DateIntervalFormat::adjustFieldWidth(const UnicodeString& inputSkeleton,
     DateIntervalInfo::parseSkeleton(inputSkeleton, inputSkeletonFieldWidth);
     DateIntervalInfo::parseSkeleton(bestMatchSkeleton, bestMatchSkeletonFieldWidth);
     if ( differenceInfo == 2 ) {
-        adjustedPtn.findAndReplace("v", "z");
+        adjustedPtn.findAndReplace(UnicodeString((UChar)0x76 /* v */),
+                                   UnicodeString((UChar)0x7a /* z */));
     }
 
     UBool inQuote = false;
@@ -1423,7 +1472,10 @@ DateIntervalFormat::fgCalendarFieldToPatternLetter[] =
     /*wWd*/ LOW_W, CAP_W, LOW_D,
     /*DEF*/ CAP_D, CAP_E, CAP_F,
     /*ahH*/ LOW_A, LOW_H, CAP_H,
-    /*m..*/ LOW_M,
+    /*msS*/ LOW_M, LOW_S, CAP_S, // MINUTE, SECOND, MILLISECOND
+    /*z.Y*/ LOW_Z, SPACE, CAP_Y, // ZONE_OFFSET, DST_OFFSET, YEAR_WOY,
+    /*eug*/ LOW_E, LOW_U, LOW_G, // DOW_LOCAL, EXTENDED_YEAR, JULIAN_DAY,
+    /*A..*/ CAP_A, SPACE, SPACE, // MILLISECONDS_IN_DAY, IS_LEAP_MONTH, FIELD_COUNT
 };
 
 

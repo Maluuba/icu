@@ -1,7 +1,7 @@
 /*
 *******************************************************************************
 *
-*   Copyright (C) 2005-2010, International Business Machines
+*   Copyright (C) 2005-2012, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 *
 *******************************************************************************
@@ -88,7 +88,7 @@ U_NAMESPACE_BEGIN
  *
  * @see LocalPointerBase
  * @see LocalPointer
- * @draft ICU 4.4
+ * @stable ICU 4.4
  */
 U_DEFINE_LOCAL_OPEN_POINTER(LocalUCaseMapPointer, UCaseMap, ucasemap_close);
 
@@ -385,10 +385,12 @@ ucasemap_utf8ToTitle(UCaseMap *csm,
 #endif
 
 /**
- * Case-fold the characters in a UTF-8 string.
+ * Case-folds the characters in a UTF-8 string.
+ *
  * Case-folding is locale-independent and not context-sensitive,
  * but there is an option for whether to include or exclude mappings for dotted I
- * and dotless i that are marked with 'I' in CaseFolding.txt.
+ * and dotless i that are marked with 'T' in CaseFolding.txt.
+ *
  * The result may be longer or shorter than the original.
  * The source string and the destination buffer must not overlap.
  *

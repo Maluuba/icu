@@ -1,6 +1,6 @@
 /********************************************************************
  * COPYRIGHT:
- * Copyright (c) 1997-2010, International Business Machines Corporation and
+ * Copyright (c) 1997-2011, International Business Machines Corporation and
  * others. All Rights Reserved.
  * Copyright (C) 2010 , Yahoo! Inc.
  ********************************************************************
@@ -16,8 +16,9 @@
 #ifndef SELFMT
 #define SELFMT
 
-#include "unicode/utypes.h"
+#include "unicode/messagepattern.h"
 #include "unicode/numfmt.h"
+#include "unicode/utypes.h"
 
 /**
  * \file
@@ -28,7 +29,7 @@
 
 U_NAMESPACE_BEGIN
 
-class Hashtable;
+class MessageFormat;
 
 /**
   * <p><code>SelectFormat</code> supports the creation of  internationalized
@@ -39,6 +40,10 @@ class Hashtable;
   * is selected; otherwise, the default phrase is used.</p>
   *
   * <h4>Using <code>SelectFormat</code> for Gender Agreement</h4>
+  *
+  * <p>Note: Typically, select formatting is done via <code>MessageFormat</code>
+  * with a <code>select</code> argument type,
+  * rather than using a stand-alone <code>SelectFormat</code>.</p>
   *
   * <p>The main use case for the select format is gender based  inflection.
   * When names or nouns are inserted into sentences, their gender can  affect pronouns,
@@ -73,6 +78,9 @@ class Hashtable;
   * but similar in grammatical use.
   * Some African languages have around 20 noun classes.</p>
   *
+  * <p><b>Note:</b>For the gender of a <i>person</i> in a given sentence,
+  * we usually need to distinguish only between female, male and other/unknown.</p>
+  *
   * <p>To enable localizers to create sentence patterns that take their
   * language's gender dependencies into consideration, software has to  provide
   * information about the gender associated with a noun or name to
@@ -81,8 +89,8 @@ class Hashtable;
   *
   * <ul>
   * <li>For people, natural gender information should be maintained  for each person.
-  * The keywords "male", "female", "mixed" (for groups of people)
-  * and "unknown" are used.
+  * Keywords like "male", "female", "mixed" (for groups of people)
+  * and "unknown" could be used.
   *
   * <li>For nouns, grammatical gender information should be maintained  for
   * each noun and per language, e.g., in resource bundles.
@@ -99,6 +107,11 @@ class Hashtable;
   * no impact on this simple sentence, would not refer to argument 1  at all:</p>
   *
   * <pre>{0} went to {2}.</pre>
+  *
+  * <p><b>Note:</b> The entire sentence should be included (and partially repeated)
+  * inside each phrase. Otherwise translators would have to be trained on how to
+  * move bits of the sentence in and out of the select argument of a message.
+  * (The examples below do not follow this recommendation!)</p>
   *
   * <p>The sentence pattern for French, where the gender of the person affects
   * the form of the participle, uses a select format based on argument 1:</p>
@@ -121,39 +134,24 @@ class Hashtable;
   *
   * <h4>Patterns and Their Interpretation</h4>
   *
-  * <p>The <code>SelectFormat</code> pattern text defines the phrase  output
+  * <p>The <code>SelectFormat</code> pattern string defines the phrase output
   * for each user-defined keyword.
-  * The pattern is a sequence of <code><i>keyword</i>{<i>phrase</i>}</code>
-  * clauses.
-  * Each clause assigns the phrase <code><i>phrase</i></code>
-  * to the user-defined <code><i>keyword</i></code>.</p>
+  * The pattern is a sequence of (keyword, message) pairs.
+  * A keyword is a "pattern identifier": [^[[:Pattern_Syntax:][:Pattern_White_Space:]]]+</p>
   *
-  * <p>Keywords must match the pattern [a-zA-Z][a-zA-Z0-9_-]*; keywords
-  * that don't match this pattern result in the error code
-  * <code>U_ILLEGAL_CHARACTER</code>.
-  * You always have to define a phrase for the default keyword
+  * <p>Each message is a MessageFormat pattern string enclosed in {curly braces}.</p>
+  *
+  * <p>You always have to define a phrase for the default keyword
   * <code>other</code>; this phrase is returned when the keyword
   * provided to
   * the <code>format</code> method matches no other keyword.
   * If a pattern does not provide a phrase for <code>other</code>, the  method
   * it's provided to returns the error  <code>U_DEFAULT_KEYWORD_MISSING</code>.
-  * If a pattern provides more than one phrase for the same keyword, the
-  * error <code>U_DUPLICATE_KEYWORD</code> is returned.
   * <br>
-  * Spaces between <code><i>keyword</i></code> and
-  * <code>{<i>phrase</i>}</code>  will be ignored; spaces within
-  * <code>{<i>phrase</i>}</code> will be preserved.<p>
+  * Pattern_White_Space between keywords and messages is ignored.
+  * Pattern_White_Space within a message is preserved and output.</p>
   *
-  * <p>The phrase for a particular select case may contain other message
-  * format patterns. <code>SelectFormat</code> preserves these so that  you
-  * can use the strings produced by <code>SelectFormat</code> with other
-  * formatters. If you are using <code>SelectFormat</code> inside a
-  * <code>MessageFormat</code> pattern, <code>MessageFormat</code> will
-  * automatically evaluate the resulting format pattern.
-  * Thus, curly braces (<code>{</code>, <code>}</code>) are <i>only</i> allowed
-  * in phrases to define a nested format pattern.</p>
-  *
-  * <p>Example:
+  * <p><pre>Example:
   * \htmlonly
   *
   * UErrorCode status = U_ZERO_ERROR;
@@ -171,6 +169,7 @@ class Hashtable;
   * delete msgFmt;
   *
   * \endhtmlonly
+  * </pre>
   * </p>
   *
   * Produces the output:<br>
@@ -178,7 +177,7 @@ class Hashtable;
   * <code>Kirti est all&#x00E9;e &#x00E0; Paris.</code>
   * \endhtmlonly
   *
-  * @draft ICU 4.4
+  * @stable ICU 4.4
   */
 
 class U_I18N_API SelectFormat : public Format {
@@ -190,19 +189,19 @@ public:
      *                 errors are returned to status if the pattern is invalid.
      * @param status   output param set to success/failure code on exit, which
      *                 must not indicate a failure before the function call.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     SelectFormat(const UnicodeString& pattern, UErrorCode& status);
 
     /**
      * copy constructor.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     SelectFormat(const SelectFormat& other);
 
     /**
      * Destructor.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual ~SelectFormat();
 
@@ -215,7 +214,7 @@ public:
      *                errors are returned to status if the pattern is invalid.
      * @param status  output param set to success/failure code on exit, which
      *                must not indicate a failure before the function call.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     void applyPattern(const UnicodeString& pattern, UErrorCode& status);
 
@@ -233,7 +232,7 @@ public:
      * @param status  output param set to success/failure code on exit, which
      *                 must not indicate a failure before the function call.
      * @return         Reference to 'appendTo' parameter.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     UnicodeString& format(const UnicodeString& keyword,
                             UnicodeString& appendTo,
@@ -244,7 +243,7 @@ public:
      * Assignment operator
      *
      * @param other    the SelectFormat object to copy from.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     SelectFormat& operator=(const SelectFormat& other);
 
@@ -253,7 +252,7 @@ public:
      *
      * @param other    the SelectFormat object to be compared with.
      * @return         true if other is semantically equal to this.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UBool operator==(const Format& other) const;
 
@@ -262,14 +261,14 @@ public:
      *
      * @param other    the SelectFormat object to be compared with.
      * @return         true if other is semantically unequal to this.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UBool operator!=(const Format& other) const;
 
     /**
      * Clones this Format object polymorphically.  The caller owns the
      * result and should delete it when done.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual Format* clone(void) const;
 
@@ -286,7 +285,7 @@ public:
      *                  On output: the offsets of the alignment field.
      * @param status    output param filled with success/failure status.
      * @return          Reference to 'appendTo' parameter.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     UnicodeString& format(const Formattable& obj,
                          UnicodeString& appendTo,
@@ -299,7 +298,7 @@ public:
      * @param  appendTo  output parameter to receive result.
      *                  Result is appended to existing contents.
      * @return the UnicodeString with inserted pattern.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     UnicodeString& toPattern(UnicodeString& appendTo);
 
@@ -323,7 +322,7 @@ public:
      *     last character successfully parsed. If the
      *     source is not parsed successfully, this param
      *     will remain unchanged.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual void parseObject(const UnicodeString& source,
                             Formattable& result,
@@ -331,40 +330,33 @@ public:
 
     /**
      * ICU "poor man's RTTI", returns a UClassID for this class.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     static UClassID U_EXPORT2 getStaticClassID(void);
 
     /**
      * ICU "poor man's RTTI", returns a UClassID for the actual class.
-     * @draft ICU 4.4
+     * @stable ICU 4.4
      */
     virtual UClassID getDynamicClassID() const;
 
 private:
-    typedef enum classesForSelectFormat{
-        tStartKeyword,
-        tContinueKeyword,
-        tLeftBrace,
-        tRightBrace,
-        tSpace,
-        tOther
-    }CharacterClass;
-
-    UnicodeString pattern;
-    //Hash to store the keyword, phrase pairs.
-    Hashtable  *parsedValuesHash;
+    friend class MessageFormat;
 
     SelectFormat();   // default constructor not implemented.
-    void init(UErrorCode& status);
-    //For the applyPattern , classifies char.s in one of the characterClass.
-    CharacterClass classifyCharacter(UChar ch) const;
-    //Checks if the "other" keyword is present in pattern.
-    UBool checkSufficientDefinition();
-    //Checks if the keyword passed is valid.
-    UBool checkValidKeyword(const UnicodeString& argKeyword) const;
-    void parsingFailure();
-    void copyHashtable(Hashtable *other, UErrorCode& status);
+
+    /**
+     * Finds the SelectFormat sub-message for the given keyword, or the "other" sub-message.
+     * @param pattern A MessagePattern.
+     * @param partIndex the index of the first SelectFormat argument style part.
+     * @param keyword a keyword to be matched to one of the SelectFormat argument's keywords.
+     * @param ec Error code.
+     * @return the sub-message start part index.
+     */
+    static int32_t findSubMessage(const MessagePattern& pattern, int32_t partIndex,
+                                  const UnicodeString& keyword, UErrorCode& ec);
+
+    MessagePattern msgPattern;
 };
 
 U_NAMESPACE_END
