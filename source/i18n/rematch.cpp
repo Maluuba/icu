@@ -1885,6 +1885,9 @@ RegexMatcher &RegexMatcher::reset(UText *input) {
         }
         fInputLength = utext_nativeLength(fInputText);
 
+        // Pre-fill the chunk buffer in case we can do chunk-based matching
+        fInputText->pFuncs->access(fInputText, 0, TRUE);
+
         delete fInput;
         fInput = NULL;
 
