@@ -85,7 +85,7 @@ typedef size_t uintptr_t;
 
 #ifdef U_HAVE_NL_LANGINFO_CODESET
     /* Use the predefined value. */
-#elif U_PLATFORM_HAS_WIN32_API || U_PLATFORM == U_PF_ANDROID || U_PLATFORM == U_PF_QNX
+#elif U_PLATFORM_HAS_WIN32_API || U_PLATFORM == U_PF_ANDROID || U_PLATFORM == U_PF_QNX || U_PLATFORM == U_PF_UNKNOWN
 #   define U_HAVE_NL_LANGINFO_CODESET 0
 #else
 #   define U_HAVE_NL_LANGINFO_CODESET 1
@@ -106,6 +106,8 @@ typedef size_t uintptr_t;
 #elif U_PLATFORM_USES_ONLY_WIN32_API
 #   define U_TZSET _tzset
 #elif U_PLATFORM == U_PF_OS400
+   /* not defined */
+#elif U_PLATFORM == U_PF_UNKNOWN
    /* not defined */
 #else
 #   define U_TZSET tzset
@@ -132,6 +134,8 @@ typedef size_t uintptr_t;
    /* not defined */
 #elif U_PLATFORM == U_PF_IPHONE
    /* not defined */
+#elif U_PLATFORM == U_PF_UNKNOWN
+   /* not defined */
 #else
 #   define U_TIMEZONE timezone
 #endif
@@ -141,6 +145,8 @@ typedef size_t uintptr_t;
 #elif U_PLATFORM_USES_ONLY_WIN32_API
 #   define U_TZNAME _tzname
 #elif U_PLATFORM == U_PF_OS400
+   /* not defined */
+#elif U_PLATFORM == U_PF_UNKNOWN
    /* not defined */
 #else
 #   define U_TZNAME tzname
