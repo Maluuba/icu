@@ -1,6 +1,6 @@
 /*
 **********************************************************************
-*   Copyright (C) 2002-2015, International Business Machines
+*   Copyright (C) 2002-2016, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 **********************************************************************
 *   file name:  regex.h
@@ -344,6 +344,24 @@ public:
     */
     virtual RegexMatcher *matcher(const UnicodeString &input,
         UErrorCode          &status) const;
+
+   /**
+    * Creates a RegexMatcher that will match the given input against this pattern.  The
+    * RegexMatcher can then be used to perform match, find or replace operations
+    * on the input.  Note that a RegexPattern object must not be deleted while
+    * RegexMatchers created from it still exist and might possibly be used again.
+    * <p>
+    * The matcher will retain a reference to the supplied input string, and all regexp
+    * pattern matching operations happen directly on this original string.  It is
+    * critical that the string not be altered or deleted before use by the regular
+    * expression operations is complete.
+    *
+    * @param input    The input string to which the regular expression will be applied.
+    * @param status   A reference to a UErrorCode to receive any errors.
+    * @return         A RegexMatcher object for this pattern and input.
+    */
+    virtual RegexMatcher *matcher(UText *input,
+        UErrorCode          &status) const;
         
 private:
     /**
@@ -450,7 +468,7 @@ public:
      * @param  groupName   The capture group name.
      * @param  status      A UErrorCode to receive any errors.
      *
-     * @draft ICU 55
+     * @stable ICU 55
      */
     virtual int32_t groupNumberFromName(const UnicodeString &groupName, UErrorCode &status) const;
 
@@ -469,7 +487,7 @@ public:
      *                     nul-terminated.
      * @param  status      A UErrorCode to receive any errors.
      *
-     * @draft ICU 55
+     * @stable ICU 55
      */
     virtual int32_t groupNumberFromName(const char *groupName, int32_t nameLength, UErrorCode &status) const;
 
@@ -849,7 +867,7 @@ public:
     *     position may not be valid with the altered input string.</p>
     *  @param   status  A reference to a UErrorCode to receive any errors.
     *  @return  TRUE if a match is found.
-    *  @draft ICU 55
+    * @stable ICU 55
     */
     virtual UBool find(UErrorCode &status);
 
@@ -1760,6 +1778,7 @@ private:
     // Instances of RegexMatcher can not be assigned, copied, cloned, etc.
     RegexMatcher();                  // default constructor not implemented
     RegexMatcher(const RegexPattern *pat);
+    RegexMatcher(const RegexPattern *pat, UText *input);
     RegexMatcher(const RegexMatcher &other);
     RegexMatcher &operator =(const RegexMatcher &rhs);
     void init(UErrorCode &status);                      // Common initialization
