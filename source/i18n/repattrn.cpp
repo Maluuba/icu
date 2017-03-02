@@ -478,32 +478,6 @@ RegexMatcher *RegexPattern::matcher(const UnicodeString &input,
 
 //---------------------------------------------------------------------
 //
-//   matcher(UText *, err)
-//
-//---------------------------------------------------------------------
-RegexMatcher *RegexPattern::matcher(UText      *input,
-                                    UErrorCode &status)  const {
-    RegexMatcher    *retMatcher = NULL;
-
-    if (U_FAILURE(status)) {
-        return NULL;
-    }
-    if (U_FAILURE(fDeferredStatus)) {
-        status = fDeferredStatus;
-        return NULL;
-    }
-
-    retMatcher = new RegexMatcher(this, input);
-    if (retMatcher == NULL) {
-        status = U_MEMORY_ALLOCATION_ERROR;
-        return NULL;
-    }
-    return retMatcher;
-}
-
-
-//---------------------------------------------------------------------
-//
 //   matcher(status)
 //
 //---------------------------------------------------------------------
