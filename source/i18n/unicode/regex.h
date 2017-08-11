@@ -1,4 +1,4 @@
-// Copyright (C) 2016 and later: Unicode, Inc. and others.
+// © 2016 and later: Unicode, Inc. and others.
 // License & terms of use: http://www.unicode.org/copyright.html
 /*
 **********************************************************************
@@ -6,7 +6,7 @@
 *   Corporation and others.  All Rights Reserved.
 **********************************************************************
 *   file name:  regex.h
-*   encoding:   US-ASCII
+*   encoding:   UTF-8
 *   indentation:4
 *
 *   created on: 2002oct22
@@ -346,21 +346,39 @@ public:
     */
     virtual RegexMatcher *matcher(const UnicodeString &input,
         UErrorCode          &status) const;
+
+   /**
+    * Creates a RegexMatcher that will match the given input against this pattern.  The
+    * RegexMatcher can then be used to perform match, find or replace operations
+    * on the input.  Note that a RegexPattern object must not be deleted while
+    * RegexMatchers created from it still exist and might possibly be used again.
+    * <p>
+    * The matcher will retain a reference to the supplied input string, and all regexp
+    * pattern matching operations happen directly on this original string.  It is
+    * critical that the string not be altered or deleted before use by the regular
+    * expression operations is complete.
+    *
+    * @param input    The input string to which the regular expression will be applied.
+    * @param status   A reference to a UErrorCode to receive any errors.
+    * @return         A RegexMatcher object for this pattern and input.
+    */
+    virtual RegexMatcher *matcher(UText *input,
+        UErrorCode          &status) const;
         
 private:
     /**
      * Cause a compilation error if an application accidentally attempts to
-     *   create a matcher with a (UChar *) string as input rather than
+     *   create a matcher with a (char16_t *) string as input rather than
      *   a UnicodeString.  Avoids a dangling reference to a temporary string.
      * <p>
-     * To efficiently work with UChar *strings, wrap the data in a UnicodeString
+     * To efficiently work with char16_t *strings, wrap the data in a UnicodeString
      * using one of the aliasing constructors, such as
-     * <code>UnicodeString(UBool isTerminated, const UChar *text, int32_t textLength);</code>
+     * <code>UnicodeString(UBool isTerminated, const char16_t *text, int32_t textLength);</code>
      * or in a UText, using
-     * <code>utext_openUChars(UText *ut, const UChar *text, int64_t textLength, UErrorCode *status);</code>
+     * <code>utext_openUChars(UText *ut, const char16_t *text, int64_t textLength, UErrorCode *status);</code>
      *
      */
-    RegexMatcher *matcher(const UChar *input,
+    RegexMatcher *matcher(const char16_t *input,
         UErrorCode          &status) const;
 public:
 
@@ -748,17 +766,17 @@ public:
 private:
     /**
      * Cause a compilation error if an application accidentally attempts to
-     *   create a matcher with a (UChar *) string as input rather than
+     *   create a matcher with a (char16_t *) string as input rather than
      *   a UnicodeString.    Avoids a dangling reference to a temporary string.
      * <p>
-     * To efficiently work with UChar *strings, wrap the data in a UnicodeString
+     * To efficiently work with char16_t *strings, wrap the data in a UnicodeString
      * using one of the aliasing constructors, such as
-     * <code>UnicodeString(UBool isTerminated, const UChar *text, int32_t textLength);</code>
+     * <code>UnicodeString(UBool isTerminated, const char16_t *text, int32_t textLength);</code>
      * or in a UText, using
-     * <code>utext_openUChars(UText *ut, const UChar *text, int64_t textLength, UErrorCode *status);</code>
+     * <code>utext_openUChars(UText *ut, const char16_t *text, int64_t textLength, UErrorCode *status);</code>
      *
      */
-    RegexMatcher(const UnicodeString &regexp, const UChar *input,
+    RegexMatcher(const UnicodeString &regexp, const char16_t *input,
         uint32_t flags, UErrorCode &status);
 public:
 
@@ -1156,17 +1174,17 @@ public:
 private:
     /**
      * Cause a compilation error if an application accidentally attempts to
-     *   reset a matcher with a (UChar *) string as input rather than
+     *   reset a matcher with a (char16_t *) string as input rather than
      *   a UnicodeString.    Avoids a dangling reference to a temporary string.
      * <p>
-     * To efficiently work with UChar *strings, wrap the data in a UnicodeString
+     * To efficiently work with char16_t *strings, wrap the data in a UnicodeString
      * using one of the aliasing constructors, such as
-     * <code>UnicodeString(UBool isTerminated, const UChar *text, int32_t textLength);</code>
+     * <code>UnicodeString(UBool isTerminated, const char16_t *text, int32_t textLength);</code>
      * or in a UText, using
-     * <code>utext_openUChars(UText *ut, const UChar *text, int64_t textLength, UErrorCode *status);</code>
+     * <code>utext_openUChars(UText *ut, const char16_t *text, int64_t textLength, UErrorCode *status);</code>
      *
      */
-    RegexMatcher &reset(const UChar *input);
+    RegexMatcher &reset(const char16_t *input);
 public:
 
    /**
@@ -1762,6 +1780,7 @@ private:
     // Instances of RegexMatcher can not be assigned, copied, cloned, etc.
     RegexMatcher();                  // default constructor not implemented
     RegexMatcher(const RegexPattern *pat);
+    RegexMatcher(const RegexPattern *pat, UText *input);
     RegexMatcher(const RegexMatcher &other);
     RegexMatcher &operator =(const RegexMatcher &rhs);
     void init(UErrorCode &status);                      // Common initialization

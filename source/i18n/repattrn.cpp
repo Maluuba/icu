@@ -1,4 +1,4 @@
-// Copyright (C) 2016 and later: Unicode, Inc. and others.
+// © 2016 and later: Unicode, Inc. and others.
 // License & terms of use: http://www.unicode.org/copyright.html
 //
 //  file:  repattrn.cpp
@@ -471,6 +471,32 @@ RegexMatcher *RegexPattern::matcher(const UnicodeString &input,
     if (retMatcher != NULL) {
         retMatcher->fDeferredStatus = status;
         retMatcher->reset(input);
+    }
+    return retMatcher;
+}
+
+
+//---------------------------------------------------------------------
+//
+//   matcher(UText *, err)
+//
+//---------------------------------------------------------------------
+RegexMatcher *RegexPattern::matcher(UText      *input,
+                                    UErrorCode &status)  const {
+    RegexMatcher    *retMatcher = NULL;
+
+    if (U_FAILURE(status)) {
+        return NULL;
+    }
+    if (U_FAILURE(fDeferredStatus)) {
+        status = fDeferredStatus;
+        return NULL;
+    }
+
+    retMatcher = new RegexMatcher(this, input);
+    if (retMatcher == NULL) {
+        status = U_MEMORY_ALLOCATION_ERROR;
+        return NULL;
     }
     return retMatcher;
 }
