@@ -101,7 +101,7 @@
 #   define NOIME
 #   define NOMCX
 #   include <windows.h>
-#   include "unicode\uloc.h"
+#   include "unicode/uloc.h"
 #if U_PLATFORM_HAS_WINUWP_API == 0
 #   include "wintz.h"
 #else // U_PLATFORM_HAS_WINUWP_API
@@ -1228,7 +1228,7 @@ UInitOnce gTimeZoneFilesInitOnce = U_INITONCE_INITIALIZER;
 static CharString *gTimeZoneFilesDirectory = NULL;
 
 #if U_POSIX_LOCALE || U_PLATFORM_USES_ONLY_WIN32_API
- static char *gCorrectedPOSIXLocale = NULL; /* Sometimes heap allocated */
+ static const char *gCorrectedPOSIXLocale = NULL; /* Sometimes heap allocated */
  static bool gCorrectedPOSIXLocaleHeapAllocated = false;
 #endif
 
@@ -1251,7 +1251,7 @@ static UBool U_CALLCONV putil_cleanup(void)
 
 #if U_POSIX_LOCALE || U_PLATFORM_USES_ONLY_WIN32_API
     if (gCorrectedPOSIXLocale && gCorrectedPOSIXLocaleHeapAllocated) {
-        uprv_free(gCorrectedPOSIXLocale);
+        uprv_free((char *)gCorrectedPOSIXLocale);
         gCorrectedPOSIXLocale = NULL;
         gCorrectedPOSIXLocaleHeapAllocated = false;
     }
