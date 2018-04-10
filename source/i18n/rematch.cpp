@@ -82,20 +82,6 @@ RegexMatcher::RegexMatcher(const RegexPattern *pat)  {
 }
 
 
-RegexMatcher::RegexMatcher(const RegexPattern *pat, UText *input)  {
-    fDeferredStatus = U_ZERO_ERROR;
-    init(fDeferredStatus);
-    if (U_FAILURE(fDeferredStatus)) {
-        return;
-    }
-    if (pat==NULL) {
-        fDeferredStatus = U_ILLEGAL_ARGUMENT_ERROR;
-        return;
-    }
-    fPattern = pat;
-    init2(input, fDeferredStatus);
-}
-
 
 RegexMatcher::RegexMatcher(const UnicodeString &regexp, const UnicodeString &input,
                            uint32_t flags, UErrorCode &status) {
@@ -1888,9 +1874,6 @@ RegexMatcher &RegexMatcher::reset(UText *input) {
             return *this;
         }
         fInputLength = utext_nativeLength(fInputText);
-
-        // Pre-fill the chunk buffer in case we can do chunk-based matching
-        fInputText->pFuncs->access(fInputText, 0, TRUE);
 
         delete fInput;
         fInput = NULL;
